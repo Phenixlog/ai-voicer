@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap");
+
+:root {
+  --bg: #05070f;
+  --bg-soft: #0f1424;
+  --bg-strong: #111932;
+  --panel: rgba(14, 21, 38, 0.82);
+  --panel-strong: rgba(11, 17, 30, 0.96);
+  --text: #ebf1ff;
+  --muted: #99a7c2;
+  --line: #243352;
+  --line-soft: rgba(36, 51, 82, 0.56);
+  --primary: #5e86ff;
+  --primary-strong: #3d6dfb;
+  --primary-soft: rgba(94, 134, 255, 0.17);
+  --ok: #2ccf9a;
+  --danger: #ff6f7f;
+  --warning: #ffc46c;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --shadow: 0 24px 60px rgba(2, 6, 15, 0.45);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(880px 560px at 94% -10%, rgba(77, 124, 255, 0.28) 0%, transparent 58%),
+    radial-gradient(680px 460px at 8% 4%, rgba(22, 180, 196, 0.15) 0%, transparent 60%),
+    linear-gradient(140deg, #05070f 0%, #090f1f 42%, #05070f 100%);
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+a {
+  color: inherit;
+}
+
+.display-title {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(160deg, var(--primary) 0%, #406fff 100%);
+  color: #f8fbff;
+  box-shadow: 0 12px 28px rgba(66, 106, 255, 0.34);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(160deg, #6f93ff 0%, var(--primary-strong) 100%);
+}
+
+.btn-ghost {
+  border-color: var(--line);
+  background: rgba(17, 25, 44, 0.62);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: #3a5384;
+  background: rgba(22, 34, 59, 0.88);
+}
+
+.card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+.section {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+
+.subtle {
+  color: var(--muted);
+}
+
+.hidden {
+  display: none !important;
+}

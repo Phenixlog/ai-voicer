@@ -1,0 +1,155 @@
+/**
+ * Théoria Design System - Spacing
+ * 8pt Grid System pour consistance visuelle
+ * Toutes les valeurs sont des multiples de 8
+ */
+
+:root {
+  /* === Base Unit === */
+  --space-unit: 0.5rem; /* 8px */
+
+  /* === Spacing Scale === */
+  --space-0: 0;
+  --space-1: 0.125rem;   /* 2px */
+  --space-2: 0.25rem;    /* 4px */
+  --space-3: 0.5rem;     /* 8px */
+  --space-4: 0.75rem;    /* 12px */
+  --space-5: 1rem;       /* 16px */
+  --space-6: 1.25rem;    /* 20px */
+  --space-7: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-9: 2.5rem;     /* 40px */
+  --space-10: 3rem;      /* 48px */
+  --space-11: 4rem;      /* 64px */
+  --space-12: 5rem;      /* 80px */
+  --space-13: 6rem;      /* 96px */
+  --space-14: 8rem;      /* 128px */
+  --space-15: 10rem;     /* 160px */
+
+  /* === Section Spacing === */
+  --section-sm: var(--space-10);
+  --section-md: var(--space-12);
+  --section-lg: var(--space-14);
+  --section-xl: var(--space-15);
+
+  /* === Component Spacing === */
+  --component-gap-xs: var(--space-2);
+  --component-gap-sm: var(--space-3);
+  --component-gap-md: var(--space-4);
+  --component-gap-lg: var(--space-5);
+  --component-gap-xl: var(--space-6);
+
+  /* === Container === */
+  --container-max: 1280px;
+  --container-narrow: 768px;
+  --container-wide: 1536px;
+  
+  --container-padding: var(--space-5);
+  --container-padding-sm: var(--space-4);
+
+  /* === Border Radius === */
+  --radius-none: 0;
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.5rem;     /* 8px */
+  --radius-lg: 0.75rem;    /* 12px */
+  --radius-xl: 1rem;       /* 16px */
+  --radius-2xl: 1.5rem;    /* 24px */
+  --radius-3xl: 2rem;      /* 32px */
+  --radius-full: 9999px;
+
+  /* === Shadows === */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  
+  /* Colored shadows for depth */
+  --shadow-primary: 0 4px 14px 0 rgba(26, 115, 232, 0.39);
+  --shadow-green: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+  
+  /* HUD Shadow */
+  --shadow-hud: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  /* === Z-Index Scale === */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-hud: 9000; /* HUD toujours au-dessus */
+}
+
+/* === Container === */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+.container-narrow {
+  max-width: var(--container-narrow);
+}
+
+.container-wide {
+  max-width: var(--container-wide);
+}
+
+/* === Section Padding === */
+.section-sm { padding-top: var(--section-sm); padding-bottom: var(--section-sm); }
+.section-md { padding-top: var(--section-md); padding-bottom: var(--section-md); }
+.section-lg { padding-top: var(--section-lg); padding-bottom: var(--section-lg); }
+.section-xl { padding-top: var(--section-xl); padding-bottom: var(--section-xl); }
+
+/* === Gap Utilities === */
+.gap-0 { gap: var(--space-0); }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+.gap-6 { gap: var(--space-6); }
+.gap-7 { gap: var(--space-7); }
+.gap-8 { gap: var(--space-8); }
+.gap-9 { gap: var(--space-9); }
+.gap-10 { gap: var(--space-10); }
+
+/* === Padding Utilities === */
+.p-0 { padding: var(--space-0); }
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-5 { padding: var(--space-5); }
+.p-6 { padding: var(--space-6); }
+.p-7 { padding: var(--space-7); }
+.p-8 { padding: var(--space-8); }
+.p-10 { padding: var(--space-10); }
+
+/* === Margin Utilities === */
+.m-0 { margin: var(--space-0); }
+.m-auto { margin: auto; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+
+/* === Responsive Container === */
+@media (max-width: 640px) {
+  .container {
+    padding-left: var(--container-padding-sm);
+    padding-right: var(--container-padding-sm);
+  }
+  
+  :root {
+    --section-sm: var(--space-8);
+    --section-md: var(--space-10);
+    --section-lg: var(--space-11);
+    --section-xl: var(--space-12);
+  }
+}

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Theoria App</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/app.css" />
+  </head>
+  <body>
+    <div class="app-backdrop"></div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <a class="brand" href="/">THEORIA</a>
+          <span class="brand-tag">Studio</span>
+        </div>
+
+        <nav class="menu">
+          <button data-tab="overview" class="menu-item active">
+            <span class="menu-dot"></span>
+            Vue d'ensemble
+          </button>
+          <button data-tab="usage" class="menu-item">
+            <span class="menu-dot"></span>
+            Usage
+          </button>
+          <button data-tab="settings" class="menu-item">
+            <span class="menu-dot"></span>
+            Settings
+          </button>
+          <button data-tab="billing" class="menu-item">
+            <span class="menu-dot"></span>
+            Billing
+          </button>
+        </nav>
+
+        <section class="sidebar-card">
+          <p class="label">Etat session</p>
+          <p id="sessionState">Session: non connecte</p>
+          <button id="logoutBtn" class="btn btn-ghost full" disabled>Se deconnecter</button>
+        </section>
+      </aside>
+
+      <main class="content">
+        <header class="content-header">
+          <div>
+            <p class="eyebrow">Control center</p>
+            <h1 class="display-title">Theoria SaaS App</h1>
+            <p id="welcomeText">Connecte-toi pour acceder a ton espace Theoria.</p>
+          </div>
+          <div class="header-actions">
+            <span id="syncStatus" class="sync-status">Etat: pret</span>
+            <a class="btn btn-ghost" href="/">Landing</a>
+          </div>
+        </header>
+
+        <section id="authCard" class="panel auth-panel">
+          <div>
+            <h2>Connexion rapide</h2>
+            <p>Entre ton email pour creer une session utilisateur en moins de 5 secondes.</p>
+          </div>
+          <div class="form-row">
+            <input id="emailInput" type="email" placeholder="toi@exemple.com" />
+            <button id="loginBtn" class="btn btn-primary">Se connecter</button>
+          </div>
+          <p id="authError" class="error"></p>
+        </section>
+
+        <section id="tab-overview" class="tab-panel">
+          <div class="panel hero-panel">
+            <div>
+              <p class="eyebrow">Workspace snapshot</p>
+              <h2>Ton cockpit transcription</h2>
+              <p>
+                Pilotage en temps reel: activite, consommation, qualite et actions monetisation
+                depuis un seul espace.
+              </p>
+            </div>
+            <div class="hero-actions">
+              <button id="refreshOverviewBtn" class="btn btn-ghost">Rafraichir</button>
+              <button id="openBillingTabBtn" class="btn btn-primary">Voir billing</button>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <article class="kpi">
+              <p>Plan actif</p>
+              <strong id="kpiPlan">-</strong>
+              <span id="quickPlan">Plan utilisateur courant</span>
+            </article>
+            <article class="kpi">
+              <p>Minutes consommees</p>
+              <strong id="kpiUsed">0</strong>
+              <span id="minutesTrend">Rafraichis pour mettre a jour</span>
+            </article>
+            <article class="kpi">
+              <p>Minutes restantes</p>
+              <strong id="kpiRemaining">0</strong>
+              <span id="usageMeterLabel">0%</span>
+            </article>
+            <article class="kpi">
+              <p>Taux de succes</p>
+              <strong id="kpiSuccess">0%</strong>
+              <span id="qualityHint">Objectif: > 95%</span>
+            </article>
+          </div>
+
+          <section class="panel meter-panel">
+            <div class="meter-head">
+              <h3>Consommation mensuelle</h3>
+              <span id="usageMeterText">0 min utilises</span>
+            </div>
+            <div class="meter-track">
+              <span id="usageMeterFill"></span>
+            </div>
+          </section>
+        </section>
+
+        <section id="tab-usage" class="tab-panel hidden">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Usage detaille</h2>
+              <button id="refreshUsageBtn" class="btn btn-ghost">Rafraichir usage</button>
+            </div>
+            <div id="usageDetails" class="details-list"></div>
+          </section>
+        </section>
+
+        <section id="tab-settings" class="tab-panel hidden">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Settings utilisateur</h2>
+              <p>Configure ton experience desktop et le rendu des transcriptions.</p>
+            </div>
+
+            <div class="settings-grid">
+              <label>
+                Hotkey
+                <input id="setHotkey" type="text" placeholder="f8" />
+              </label>
+              <label>
+                Trigger mode
+                <select id="setTriggerMode">
+                  <option value="hold">hold</option>
+                  <option value="toggle">toggle</option>
+                </select>
+              </label>
+              <label>
+                Langue
+                <input id="setLanguage" type="text" placeholder="fr" />
+              </label>
+              <label>
+                Style de sortie
+                <input id="setOutputStyle" type="text" placeholder="default" />
+              </label>
+            </div>
+            <div class="actions-row">
+              <button id="saveSettingsBtn" class="btn btn-primary">Sauvegarder</button>
+              <span id="settingsState" class="subtle"></span>
+            </div>
+          </section>
+        </section>
+
+        <section id="tab-billing" class="tab-panel hidden">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Billing et abonnement</h2>
+              <p>Choisis un plan et ouvre checkout. Gele ta dette tech, accelere la conversion.</p>
+            </div>
+            <div id="plansGrid" class="plans-grid"></div>
+            <div class="actions-row">
+              <button id="openPortalBtn" class="btn btn-ghost">Ouvrir portail client</button>
+              <span id="billingState" class="subtle"></span>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/assets/js/app.js"></script>
+  </body>
+</html>

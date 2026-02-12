@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Theoria - Voice Productivity SaaS</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="/assets/landing.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">THEORIA</a>
+      <nav class="nav">
+        <a href="#features">Produit</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-ghost" href="/docs">API</a>
+        <a class="btn btn-primary" href="/app">Ouvrir l'app</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero section">
+        <p class="eyebrow">Voice-to-text pour professionnels</p>
+        <h1>Parle une fois. Ecris partout.</h1>
+        <p class="lead">
+          Theoria capture ta voix avec un raccourci clavier, structure le texte,
+          puis l'injecte dans ton outil actif en quelques secondes.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="/app">Demarrer gratuitement</a>
+          <a class="btn btn-ghost" href="#pricing">Voir les plans</a>
+        </div>
+        <p class="subtle">Compatible avec Cursor, Notion, Gmail, Slack et plus.</p>
+      </section>
+
+      <section id="features" class="section grid-3">
+        <article class="card">
+          <h3>Push-to-talk fluide</h3>
+          <p>Appuie, parle, relache. L'ecriture suit ton rythme sans changer d'app.</p>
+        </article>
+        <article class="card">
+          <h3>Texte propre</h3>
+          <p>Orthographe, ponctuation et structure sont nettoyees automatiquement.</p>
+        </article>
+        <article class="card">
+          <h3>Pret pour SaaS</h3>
+          <p>Auth, usage, billing, settings: base solide pour commercialiser vite.</p>
+        </article>
+      </section>
+
+      <section class="section split">
+        <div class="card large">
+          <h2>Pipeline produit deja en place</h2>
+          <ul class="check-list">
+            <li>Desktop hotkey + HUD de statut</li>
+            <li>API SaaS centralisee (transcription + structuration)</li>
+            <li>Comptes utilisateurs et JWT</li>
+            <li>Suivi usage et quotas</li>
+            <li>Hooks billing Stripe prets a brancher</li>
+          </ul>
+        </div>
+        <div class="card large dark">
+          <h2>Concu pour vendre</h2>
+          <p>
+            Cette base te permet d'iterer rapidement sur l'offre: onboarding, activation,
+            conversion payante et retention.
+          </p>
+          <a class="btn btn-primary" href="/app">Acceder a l'app</a>
+        </div>
+      </section>
+
+      <section id="pricing" class="section">
+        <h2 class="center">Pricing simple</h2>
+        <div class="grid-3">
+          <article class="card price">
+            <h3>Starter</h3>
+            <p class="price-value">0 EUR<span>/mois</span></p>
+            <ul>
+              <li>Jusqu'a 60 min/mois</li>
+              <li>Structuration standard</li>
+              <li>Support communautaire</li>
+            </ul>
+          </article>
+          <article class="card price featured">
+            <span class="pill">Le plus choisi</span>
+            <h3>Pro</h3>
+            <p class="price-value">19 EUR<span>/mois</span></p>
+            <ul>
+              <li>600 min/mois</li>
+              <li>Priorite de traitement</li>
+              <li>Support prioritaire</li>
+            </ul>
+          </article>
+          <article class="card price">
+            <h3>Business</h3>
+            <p class="price-value">49 EUR<span>/mois</span></p>
+            <ul>
+              <li>Illimite raisonnable</li>
+              <li>Reporting equipe</li>
+              <li>Support dedie</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="faq" class="section">
+        <h2 class="center">FAQ</h2>
+        <div class="faq">
+          <article class="card">
+            <h3>Le texte est-il automatiquement colle ?</h3>
+            <p>Oui, apres traitement, le daemon colle le texte dans le champ actif.</p>
+          </article>
+          <article class="card">
+            <h3>Puis-je changer mon raccourci clavier ?</h3>
+            <p>Oui, depuis l'application web, puis sync sur le daemon.</p>
+          </article>
+          <article class="card">
+            <h3>Stripe est-il deja integre ?</h3>
+            <p>La base est prete: checkout et portail client peuvent etre actives.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>© Theoria</span>
+      <a href="/app">App</a>
+      <a href="/docs">Documentation API</a>
+    </footer>
+  </body>
+</html>

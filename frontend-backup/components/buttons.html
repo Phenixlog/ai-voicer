@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Théoria - Buttons Component Library</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Inter', -apple-system, sans-serif; }
+    
+    .component-section {
+      @apply mb-12;
+    }
+    .component-label {
+      @apply text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Buttons</h1>
+    <p class="text-slate-600 mb-12">Composants boutons réutilisables pour Théoria.</p>
+
+    <!-- Primary Buttons -->
+    <div class="component-section">
+      <div class="component-label">Primary Buttons</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button class="inline-flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all hover:shadow-md active:scale-95">
+          Small
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all hover:shadow-md active:scale-95">
+          Default
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all hover:shadow-lg hover:shadow-blue-600/25 active:scale-95">
+          Large
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all hover:shadow-xl hover:shadow-blue-600/25 active:scale-95">
+          Extra Large
+        </button>
+      </div>
+    </div>
+
+    <!-- Secondary Buttons -->
+    <div class="component-section">
+      <div class="component-label">Secondary Buttons</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-all active:scale-95">
+          Default
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-base font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-all active:scale-95">
+          Large
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all active:scale-95">
+          Ghost Primary
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-all active:scale-95">
+          Ghost
+        </button>
+      </div>
+    </div>
+
+    <!-- Accent Buttons -->
+    <div class="component-section">
+      <div class="component-label">Accent Buttons</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-500 hover:bg-emerald-600 rounded-lg transition-all hover:shadow-lg hover:shadow-emerald-500/25 active:scale-95">
+          Success
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-all hover:shadow-lg hover:shadow-amber-500/25 active:scale-95">
+          Warning
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-lg transition-all hover:shadow-lg hover:shadow-red-500/25 active:scale-95">
+          Danger
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 rounded-lg transition-all hover:shadow-lg active:scale-95">
+          Dark
+        </button>
+      </div>
+    </div>
+
+    <!-- Icon Buttons -->
+    <div class="component-section">
+      <div class="component-label">Icon Buttons</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all active:scale-95">
+          <i data-lucide="mic" class="w-4 h-4"></i>
+          Start Recording
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-all active:scale-95">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          Settings
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-all active:scale-95">
+          Learn more
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Icon Only Buttons -->
+    <div class="component-section">
+      <div class="component-label">Icon Only</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button class="inline-flex items-center justify-center w-9 h-9 text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-all active:scale-95">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </button>
+        <button class="inline-flex items-center justify-center w-10 h-10 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all active:scale-95">
+          <i data-lucide="plus" class="w-5 h-5"></i>
+        </button>
+        <button class="inline-flex items-center justify-center w-10 h-10 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-all active:scale-95">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
+        </button>
+        <button class="inline-flex items-center justify-center w-10 h-10 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all active:scale-95">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading States -->
+    <div class="component-section">
+      <div class="component-label">Loading States</div>
+      <div class="flex flex-wrap items-center gap-4 p-6 bg-white rounded-xl border border-slate-200">
+        <button disabled class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 opacity-50 cursor-not-allowed rounded-lg">
+          <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="20" stroke-linecap="round"/>
+          </svg>
+          Processing...
+        </button>
+        <button class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-500 rounded-lg">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Saved
+        </button>
+      </div>
+    </div>
+
+    <!-- Special: Recording Button -->
+    <div class="component-section">
+      <div class="component-label">Special: Recording Button</div>
+      <div class="flex flex-wrap items-center gap-6 p-6 bg-slate-900 rounded-xl">
+        <button class="group relative inline-flex items-center justify-center gap-3 px-6 py-3 text-base font-semibold text-white bg-emerald-500 hover:bg-emerald-400 rounded-full transition-all hover:shadow-xl hover:shadow-emerald-500/30 active:scale-95">
+          <span class="relative flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-white"></span>
+          </span>
+          Recording...
+        </button>
+        
+        <button class="inline-flex items-center justify-center w-14 h-14 text-white bg-red-500 hover:bg-red-600 rounded-full transition-all hover:shadow-lg hover:shadow-red-500/30 active:scale-95">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

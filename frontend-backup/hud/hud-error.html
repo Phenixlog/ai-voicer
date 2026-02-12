@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Théoria HUD - Error</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    /* HUD Container - Error state has subtle red glow */
+    .hud {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 100px;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(239, 68, 68, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      animation: hudEnter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes hudEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    /* Error Icon */
+    .error-icon {
+      width: 16px;
+      height: 16px;
+      background: #ef4444;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: errorPulse 2s ease-in-out infinite;
+    }
+    
+    .error-icon::before {
+      content: '!';
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    
+    @keyframes errorPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    }
+    
+    /* Text Content */
+    .hud-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .hud-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ef4444;
+      letter-spacing: -0.2px;
+    }
+    
+    .hud-hint {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.8);
+    }
+    
+    /* Retry Button */
+    .retry-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(239, 68, 68, 0.15);
+      border: none;
+      border-radius: 100px;
+      color: #ef4444;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .retry-btn:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+    
+    .retry-btn svg {
+      width: 10px;
+      height: 10px;
+    }
+    
+    /* Demo Container */
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: 40px;
+      background: #1e293b;
+      border-radius: 20px;
+    }
+    
+    .demo-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Error State -->
+    <div>
+      <div class="demo-label">État: Erreur</div>
+      <div class="hud">
+        <div class="error-icon"></div>
+        <div class="hud-content">
+          <div class="hud-status">Erreur de transcription</div>
+          <div class="hud-hint">Vérifiez votre connexion</div>
+        </div>
+        <button class="retry-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          Réessayer
+        </button>
+      </div>
+    </div>
+    
+    <!-- Error - Microphone Permission -->
+    <div>
+      <div class="demo-label">Erreur: Permission micro</div>
+      <div class="hud">
+        <div class="error-icon"></div>
+        <div class="hud-content">
+          <div class="hud-status">Micro non accessible</div>
+          <div class="hud-hint">Autorisez l'accès dans les préférences</div>
+        </div>
+        <button class="retry-btn">Ouvrir les prefs</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

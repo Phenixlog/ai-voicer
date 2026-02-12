@@ -1,0 +1,146 @@
+/**
+ * Théoria Design System - Colors
+ * Palette inspirée par l'audio et la voix : bleu profond, touches vert/jaune
+ * Valeurs: discret, fiable, rapide, élégant
+ */
+
+:root {
+  /* === Primary Colors - Deep Ocean Voice === */
+  --color-primary-50: #eef7ff;
+  --color-primary-100: #d9edff;
+  --color-primary-200: #bce0ff;
+  --color-primary-300: #8ecdff;
+  --color-primary-400: #59b0ff;
+  --color-primary-500: #3390f5;
+  --color-primary-600: #1a73e8;
+  --color-primary-700: #155cc4;
+  --color-primary-800: #174d9e;
+  --color-primary-900: #19417c;
+  --color-primary-950: #0f2748;
+
+  /* === Accent Colors - Audio Waves === */
+  /* Green for "Active/Recording" */
+  --color-accent-green-50: #ecfdf5;
+  --color-accent-green-100: #d1fae5;
+  --color-accent-green-200: #a7f3d0;
+  --color-accent-green-300: #6ee7b7;
+  --color-accent-green-400: #34d399;
+  --color-accent-green-500: #10b981;
+  --color-accent-green-600: #059669;
+  --color-accent-green-700: #047857;
+  --color-accent-green-800: #065f46;
+  --color-accent-green-900: #064e3b;
+  --color-accent-green-950: #022c22;
+
+  /* Yellow/Amber for "Processing" */
+  --color-accent-yellow-50: #fffbeb;
+  --color-accent-yellow-100: #fef3c7;
+  --color-accent-yellow-200: #fde68a;
+  --color-accent-yellow-300: #fcd34d;
+  --color-accent-yellow-400: #fbbf24;
+  --color-accent-yellow-500: #f59e0b;
+  --color-accent-yellow-600: #d97706;
+  --color-accent-yellow-700: #b45309;
+  --color-accent-yellow-800: #92400e;
+  --color-accent-yellow-900: #78350f;
+  --color-accent-yellow-950: #451a03;
+
+  /* === Semantic Colors === */
+  --color-success: var(--color-accent-green-500);
+  --color-success-light: var(--color-accent-green-100);
+  --color-success-dark: var(--color-accent-green-700);
+  
+  --color-warning: var(--color-accent-yellow-500);
+  --color-warning-light: var(--color-accent-yellow-100);
+  --color-warning-dark: var(--color-accent-yellow-700);
+  
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  --color-error-dark: #b91c1c;
+  
+  --color-info: var(--color-primary-500);
+  --color-info-light: var(--color-primary-100);
+  --color-info-dark: var(--color-primary-700);
+
+  /* === Neutral Scale - Slate === */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+
+  /* === Background Colors === */
+  --bg-primary: #ffffff;
+  --bg-secondary: var(--color-slate-50);
+  --bg-tertiary: var(--color-slate-100);
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(15, 23, 42, 0.5);
+  --bg-inverse: var(--color-slate-900);
+
+  /* === Text Colors === */
+  --text-primary: var(--color-slate-900);
+  --text-secondary: var(--color-slate-600);
+  --text-tertiary: var(--color-slate-400);
+  --text-inverse: #ffffff;
+  --text-link: var(--color-primary-600);
+  --text-link-hover: var(--color-primary-700);
+
+  /* === Border Colors === */
+  --border-light: var(--color-slate-200);
+  --border-medium: var(--color-slate-300);
+  --border-strong: var(--color-slate-400);
+  --border-focus: var(--color-primary-500);
+
+  /* === HUD Specific Colors === */
+  --hud-bg: rgba(15, 23, 42, 0.9);
+  --hud-bg-blur: rgba(15, 23, 42, 0.75);
+  --hud-text: #ffffff;
+  --hud-accent-recording: var(--color-accent-green-400);
+  --hud-accent-processing: var(--color-accent-yellow-400);
+  --hud-accent-error: var(--color-error);
+}
+
+/* === Dark Mode === */
+[data-theme="dark"] {
+  --bg-primary: var(--color-slate-950);
+  --bg-secondary: var(--color-slate-900);
+  --bg-tertiary: var(--color-slate-800);
+  --bg-elevated: var(--color-slate-800);
+  --bg-overlay: rgba(2, 6, 23, 0.8);
+  --bg-inverse: var(--color-slate-100);
+
+  --text-primary: var(--color-slate-50);
+  --text-secondary: var(--color-slate-400);
+  --text-tertiary: var(--color-slate-500);
+  --text-inverse: var(--color-slate-900);
+  --text-link: var(--color-primary-400);
+  --text-link-hover: var(--color-primary-300);
+
+  --border-light: var(--color-slate-800);
+  --border-medium: var(--color-slate-700);
+  --border-strong: var(--color-slate-600);
+  --border-focus: var(--color-primary-400);
+
+  --hud-bg: rgba(2, 6, 23, 0.95);
+  --hud-bg-blur: rgba(2, 6, 23, 0.85);
+}
+
+/* === Utility Classes === */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+.bg-elevated { background-color: var(--bg-elevated); }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-inverse { color: var(--text-inverse); }
+
+.border-light { border-color: var(--border-light); }
+.border-medium { border-color: var(--border-medium); }

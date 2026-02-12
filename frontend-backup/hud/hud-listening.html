@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Théoria HUD - Listening</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    
+    /* HUD Container - Floating pill design */
+    .hud {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 100px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+      animation: hudEnter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    @keyframes hudEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    /* Recording Indicator */
+    .recording-indicator {
+      position: relative;
+      width: 14px;
+      height: 14px;
+    }
+    
+    .recording-dot {
+      width: 100%;
+      height: 100%;
+      background: #10b981;
+      border-radius: 50%;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .recording-ring {
+      position: absolute;
+      inset: -4px;
+      border: 2px solid #10b981;
+      border-radius: 50%;
+      animation: pulseRing 1.5s ease-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.9); opacity: 0.8; }
+    }
+    
+    @keyframes pulseRing {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+    
+    /* Text Content */
+    .hud-content {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .hud-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: #10b981;
+      letter-spacing: -0.2px;
+    }
+    
+    .hud-hint {
+      font-size: 11px;
+      color: rgba(148, 163, 184, 0.8);
+    }
+    
+    /* Waveform */
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 24px;
+    }
+    
+    .waveform-bar {
+      width: 3px;
+      background: #10b981;
+      border-radius: 2px;
+      animation: waveform 0.8s ease-in-out infinite;
+    }
+    
+    .waveform-bar:nth-child(1) { height: 30%; animation-delay: 0s; }
+    .waveform-bar:nth-child(2) { height: 60%; animation-delay: 0.1s; }
+    .waveform-bar:nth-child(3) { height: 100%; animation-delay: 0.2s; }
+    .waveform-bar:nth-child(4) { height: 70%; animation-delay: 0.3s; }
+    .waveform-bar:nth-child(5) { height: 40%; animation-delay: 0.4s; }
+    .waveform-bar:nth-child(6) { height: 80%; animation-delay: 0.15s; }
+    .waveform-bar:nth-child(7) { height: 50%; animation-delay: 0.25s; }
+    
+    @keyframes waveform {
+      0%, 100% { transform: scaleY(0.4); }
+      50% { transform: scaleY(1); }
+    }
+    
+    /* Duration Badge */
+    .duration {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(148, 163, 184, 0.8);
+      font-variant-numeric: tabular-nums;
+      margin-left: 4px;
+    }
+    
+    /* Variants for demo */
+    .demo-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: 40px;
+      background: #1e293b;
+      border-radius: 20px;
+    }
+    
+    .demo-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Listening State -->
+    <div>
+      <div class="demo-label">État: Écoute...</div>
+      <div class="hud">
+        <div class="recording-indicator">
+          <div class="recording-dot"></div>
+          <div class="recording-ring"></div>
+        </div>
+        <div class="hud-content">
+          <div class="hud-status">Écoute...</div>
+          <div class="hud-hint">Parlez maintenant</div>
+        </div>
+        <div class="waveform">
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+          <div class="waveform-bar"></div>
+        </div>
+        <span class="duration">0:12</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

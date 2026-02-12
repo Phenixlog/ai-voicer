@@ -1,0 +1,132 @@
+# Théoria - Render.com Blueprint
+# Infrastructure as Code for Render.com deployment
+# 
+# Usage:
+# 1. Fork/push this repo to GitHub
+# 2. Create new Blueprint on Render.com
+# 3. Point to this render.yaml
+# 4. Configure environment variables in Render Dashboard
+
+databases:
+  # PostgreSQL Database (Managed)
+  - name: theoria-postgres
+    databaseName: theoria
+    user: theoria
+    plan: starter  # Upgrade to 'standard' for production
+    ipAllowList: []  # Empty = allow from anywhere (needed for services)
+    postgresMajorVersion: "16"
+    region: frankfurt  # Closest to target users (Europe)
+    # High Availability: Enable for production
+    # haMode: enabled
+
+  # Redis Cache (Managed)
+  - name: theoria-redis
+    plan: starter  # 256MB, upgrade to 'standard' for production
+    ipAllowList: []
+    region: frankfurt
+    version: "7"
+
+services:
+  # FastAPI Application
+  - type: web
+    name: theoria-api
+    runtime: docker
+    plan: starter  # Upgrade based on traffic: standard/pro
+    region: frankfurt
+    dockerfilePath: ./infrastructure/Dockerfile
+    dockerContext: .
+    
+    # Health check endpoint
+    healthCheckPath: /health
+    
+    # Auto-scaling configuration (Render auto-scales based on plan)
+    # For manual scaling control, use:
+    # numInstances: 2  # Minimum for HA
+    
+    # Environment variables
+    envVars:
+      # Database (auto-populated by Render)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: theoria-postgres
+          property: connectionString
+      
+      # Redis (auto-populated by Render)
+      - key: REDIS_URL
+        fromRedis:
+          name: theoria-redis
+          property: connectionString
+      
+      # API Configuration
+      - key: AI_VOICER_API_HOST
+        value: 0.0.0.0
+      - key: AI_VOICER_API_PORT
+        value: 10000  # Render assigns this port
+      - key: AI_VOICER_LOG_LEVEL
+        value: INFO
+      
+      # Mistral Configuration
+      - key: AI_VOICER_TRANSCRIBE_MODEL
+        value: voxtral-mini-latest
+      - key: AI_VOICER_STRUCTURE_MODEL
+        value: mistral-small-latest
+      - key: AI_VOICER_LANGUAGE
+        value: fr
+      - key: AI_VOICER_ENABLE_STRUCTURING
+        value: true
+      
+      # Python settings
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      
+      # Security (set in Render Dashboard - NOT HERE)
+      # - key: MISTRAL_API_KEY
+      #   sync: false
+      # - key: AI_VOICER_API_AUTH_TOKEN
+      #   sync: false
+    
+    # Auto-deploy on push to main
+    autoDeploy: true
+    
+    # Branch to deploy
+    branch: main
+
+  # Background Worker (for future async processing)
+  # - type: worker
+  #   name: theoria-worker
+  #   runtime: docker
+  #   plan: starter
+  #   region: frankfurt
+  #   dockerfilePath: ./infrastructure/Dockerfile.worker
+  #   dockerContext: .
+  #   envVars:
+  #     - key: DATABASE_URL
+  #       fromDatabase:
+  #         name: theoria-postgres
+  #         property: connectionString
+  #     - key: REDIS_URL
+  #       fromRedis:
+  #         name: theoria-redis
+  #         property: connectionString
+  #   autoDeploy: true
+
+  # Static Site - Documentation/Landing (optional)
+  # - type: web
+  #   name: theoria-docs
+  #   runtime: static
+  #   buildCommand: cd docs && npm install && npm run build
+  #   staticPublishPath: ./docs/dist
+  #   routes:
+  #     - type: rewrite
+  #       source: /api/*
+  #       destination: https://theoria-api.onrender.com/api/$1
+
+# Environment Groups (for shared config across services)
+# envVarGroups:
+#   - name: theoria-common
+#     envVars:
+#       - key: APP_ENV
+#         value: production
+
+# Version
+version: "1"

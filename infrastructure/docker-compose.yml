@@ -1,0 +1,122 @@
+# Théoria - Development Stack
+# Local development with Docker Compose
+# Usage: docker-compose up -d
+
+version: "3.9"
+
+services:
+  # PostgreSQL - Primary Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: theoria-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-theoria}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-theoria_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-theoria}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-theoria} -d ${POSTGRES_DB:-theoria}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - theoria-network
+
+  # Redis - Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: theoria-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - theoria-network
+
+  # API Server - FastAPI Application
+  api:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: theoria-api
+    restart: unless-stopped
+    environment:
+      # Database
+      DATABASE_URL: postgresql://${POSTGRES_USER:-theoria}:${POSTGRES_PASSWORD:-theoria_dev_password}@postgres:5432/${POSTGRES_DB:-theoria}
+      
+      # Redis
+      REDIS_URL: redis://redis:6379/0
+      
+      # API Configuration
+      AI_VOICER_API_HOST: 0.0.0.0
+      AI_VOICER_API_PORT: 8000
+      AI_VOICER_LOG_LEVEL: ${AI_VOICER_LOG_LEVEL:-DEBUG}
+      
+      # Mistral API (required)
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      
+      # Optional Configuration
+      AI_VOICER_TRANSCRIBE_MODEL: ${AI_VOICER_TRANSCRIBE_MODEL:-voxtral-mini-latest}
+      AI_VOICER_STRUCTURE_MODEL: ${AI_VOICER_STRUCTURE_MODEL:-mistral-small-latest}
+      AI_VOICER_LANGUAGE: ${AI_VOICER_LANGUAGE:-fr}
+      AI_VOICER_ENABLE_STRUCTURING: ${AI_VOICER_ENABLE_STRUCTURING:-true}
+      
+      # Security
+      AI_VOICER_API_AUTH_TOKEN: ${AI_VOICER_API_AUTH_TOKEN}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - theoria-network
+    volumes:
+      - api_logs:/app/logs
+
+  # Database Migration Runner (optional - runs on startup)
+  # migrations:
+  #   build:
+  #     context: ..
+  #     dockerfile: infrastructure/Dockerfile
+  #   command: alembic upgrade head
+  #   environment:
+  #     DATABASE_URL: postgresql://${POSTGRES_USER:-theoria}:${POSTGRES_PASSWORD:-theoria_dev_password}@postgres:5432/${POSTGRES_DB:-theoria}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - theoria-network
+  #   profiles:
+  #     - migrations
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  api_logs:
+    driver: local
+
+networks:
+  theoria-network:
+    driver: bridge

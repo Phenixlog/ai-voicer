@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Théoria</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <link rel="stylesheet" href="../design-system/colors.css">
+  <link rel="stylesheet" href="../design-system/typography.css">
+  <link rel="stylesheet" href="../design-system/spacing.css">
+  <link rel="stylesheet" href="../design-system/animations.css">
+  <link rel="stylesheet" href="../design-system/components.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    * { font-family: 'Inter', -apple-system, sans-serif; }
+    
+    .sidebar-link { @apply flex items-center gap-3 px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:bg-slate-100 hover:text-slate-900 transition-colors; }
+    .sidebar-link.active { @apply bg-blue-50 text-blue-600; }
+    
+    .stat-card { @apply bg-white rounded-xl p-5 border border-slate-200; }
+    
+    /* Progress Ring */
+    .progress-ring { transform: rotate(-90deg); }
+    .progress-ring-circle { transition: stroke-dashoffset 0.5s ease; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  
+  <!-- Top Navbar -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200 h-16">
+    <div class="flex items-center justify-between h-full px-4 lg:px-6">
+      <!-- Left -->
+      <div class="flex items-center gap-4">
+        <button class="lg:hidden p-2 rounded-lg hover:bg-slate-100">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center">
+            <i data-lucide="mic" class="w-4 h-4 text-white"></i>
+          </div>
+          <span class="font-bold text-lg">Théoria</span>
+        </a>
+      </div>
+      
+      <!-- Right -->
+      <div class="flex items-center gap-3">
+        <button class="p-2 rounded-lg hover:bg-slate-100 text-slate-600 relative">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+        
+        <div class="flex items-center gap-3 pl-3 border-l border-slate-200">
+          <div class="text-right hidden sm:block">
+            <div class="text-sm font-medium">Jean Dupont</div>
+            <div class="text-xs text-slate-500">Plan Pro</div>
+          </div>
+          <button class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
+            JD
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="flex pt-16 min-h-screen">
+    <!-- Sidebar -->
+    <aside class="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-slate-200 overflow-y-auto hidden lg:block">
+      <div class="p-4">
+        <!-- Main Nav -->
+        <nav class="space-y-1 mb-6">
+          <a href="#" class="sidebar-link active">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            Tableau de bord
+          </a>
+          <a href="#" class="sidebar-link">
+            <i data-lucide="history" class="w-5 h-5"></i>
+            Historique
+          </a>
+          <a href="#" class="sidebar-link">
+            <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+            Statistiques
+          </a>
+        </nav>
+        
+        <!-- Settings -->
+        <div class="pt-4 border-t border-slate-200">
+          <div class="px-3 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Paramètres</div>
+          <nav class="space-y-1">
+            <a href="#" class="sidebar-link">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              Compte
+            </a>
+            <a href="#" class="sidebar-link">
+              <i data-lucide="mic" class="w-5 h-5"></i>
+              Préférences voix
+            </a>
+            <a href="#" class="sidebar-link">
+              <i data-lucide="keyboard" class="w-5 h-5"></i>
+              Raccourcis
+            </a>
+            <a href="#" class="sidebar-link">
+              <i data-lucide="credit-card" class="w-5 h-5"></i>
+              Facturation
+            </a>
+          </nav>
+        </div>
+        
+        <!-- Help -->
+        <div class="pt-4 border-t border-slate-200 mt-4">
+          <nav class="space-y-1">
+            <a href="#" class="sidebar-link">
+              <i data-lucide="help-circle" class="w-5 h-5"></i>
+              Aide & Support
+            </a>
+            <a href="#" class="sidebar-link text-red-600 hover:text-red-700 hover:bg-red-50">
+              <i data-lucide="log-out" class="w-5 h-5"></i>
+              Déconnexion
+            </a>
+          </nav>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-64 p-4 lg:p-8">
+      <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-2xl font-bold text-slate-900">Tableau de bord</h1>
+          <p class="text-slate-600">Bienvenue, voici votre résumé d'activité.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <!-- Usage This Month -->
+          <div class="stat-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Usage ce mois</p>
+                <p class="text-2xl font-bold text-slate-900">2h 34m</p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <i data-lucide="mic" class="w-5 h-5 text-blue-600"></i>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-emerald-600 font-medium flex items-center gap-1">
+                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                +12%
+              </span>
+              <span class="text-slate-400">vs mois dernier</span>
+            </div>
+          </div>
+          
+          <!-- Transcriptions -->
+          <div class="stat-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Transcriptions</p>
+                <p class="text-2xl font-bold text-slate-900">847</p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <i data-lucide="file-text" class="w-5 h-5 text-emerald-600"></i>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-emerald-600 font-medium flex items-center gap-1">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                99.2%
+              </span>
+              <span class="text-slate-400">taux de succès</span>
+            </div>
+          </div>
+          
+          <!-- Average Time -->
+          <div class="stat-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Temps moyen</p>
+                <p class="text-2xl font-bold text-slate-900">3.2s</p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                <i data-lucide="zap" class="w-5 h-5 text-amber-600"></i>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-slate-400">De la voix au texte</span>
+            </div>
+          </div>
+          
+          <!-- Plan Status -->
+          <div class="stat-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <p class="text-sm text-slate-500 mb-1">Plan actuel</p>
+                <p class="text-2xl font-bold text-slate-900">Pro</p>
+              </div>
+              <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+                <i data-lucide="crown" class="w-5 h-5 text-purple-600"></i>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+              <span class="text-slate-400">Renouvellement le 15/03</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+          <!-- Usage Chart -->
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="font-semibold text-slate-900">Usage des 30 derniers jours</h2>
+              <select class="text-sm border border-slate-200 rounded-lg px-3 py-1.5 bg-white">
+                <option>30 derniers jours</option>
+                <option>7 derniers jours</option>
+                <option>Cette année</option>
+              </select>
+            </div>
+            
+            <!-- Chart Placeholder -->
+            <div class="h-64 flex items-end gap-2">
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 40%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 60%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 45%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 80%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 55%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 70%"></div>
+              <div class="flex-1 bg-blue-100 rounded-t" style="height: 90%"></div>
+              <div class="flex-1 bg-blue-600 rounded-t relative" style="height: 100%">
+                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-2 py-1 rounded">
+                  2h 34m
+                </div>
+              </div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 30%"></div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 20%"></div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 35%"></div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 25%"></div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 40%"></div>
+              <div class="flex-1 bg-slate-100 rounded-t" style="height: 50%"></div>
+            </div>
+            <div class="flex justify-between mt-4 text-xs text-slate-400">
+              <span>1 fév</span>
+              <span>15 fév</span>
+              <span>Aujourd'hui</span>
+            </div>
+          </div>
+
+          <!-- Quota Card -->
+          <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="font-semibold text-slate-900 mb-6">Quota mensuel</h2>
+            
+            <div class="flex justify-center mb-6">
+              <div class="relative w-40 h-40">
+                <svg class="progress-ring w-40 h-40" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                  <circle cx="60" cy="60" r="54" fill="none" stroke="#1a73e8" stroke-width="8" 
+                          stroke-linecap="round" stroke-dasharray="339.292" stroke-dashoffset="101.788"
+                          class="progress-ring-circle"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                  <span class="text-3xl font-bold text-slate-900">70%</span>
+                  <span class="text-sm text-slate-500">utilisé</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-600">Utilisé</span>
+                <span class="font-medium text-slate-900">2h 34m</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-600">Restant</span>
+                <span class="font-medium text-slate-900">1h 26m</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-slate-600">Total</span>
+                <span class="font-medium text-slate-900">5h 00m</span>
+              </div>
+            </div>
+            
+            <button class="w-full py-2.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+              Passer à Power
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="mt-6 bg-white rounded-xl border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="font-semibold text-slate-900">Activité récente</h2>
+            <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Voir tout</a>
+          </div>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-900">Note de réunion</p>
+                  <p class="text-sm text-slate-500">12 min • Slack</p>
+                </div>
+              </div>
+              <span class="text-sm text-slate-400">Il y a 2h</span>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-900">Email client</p>
+                  <p class="text-sm text-slate-500">5 min • Gmail</p>
+                </div>
+              </div>
+              <span class="text-sm text-slate-400">Il y a 4h</span>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <i data-lucide="check" class="w-5 h-5 text-emerald-600"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-900">Idée produit</p>
+                  <p class="text-sm text-slate-500">3 min • Notion</p>
+                </div>
+              </div>
+              <span class="text-sm text-slate-400">Hier</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Settings -->
+        <div class="mt-6 grid md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="font-semibold text-slate-900 mb-4">Raccourci clavier</h2>
+            <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+              <div class="flex items-center gap-2">
+                <kbd class="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-mono">⌘</kbd>
+                <kbd class="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-mono">⇧</kbd>
+                <kbd class="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-mono">T</kbd>
+              </div>
+              <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">Modifier</button>
+            </div>
+          </div>
+          
+          <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="font-semibold text-slate-900 mb-4">Style par défaut</h2>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <i data-lucide="message-square" class="w-5 h-5 text-blue-600"></i>
+                </div>
+                <div>
+                  <p class="font-medium text-slate-900">Message informel</p>
+                  <p class="text-sm text-slate-500">Ton naturel, concis</p>
+                </div>
+              </div>
+              <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">Changer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

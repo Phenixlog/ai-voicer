@@ -1,0 +1,21 @@
+# Core dependencies (existing)
+mistralai
+sounddevice
+numpy
+pynput
+python-dotenv
+fastapi
+uvicorn
+python-multipart
+httpx
+
+# SaaS extensions
+sqlalchemy
+psycopg2-binary  # PostgreSQL driver
+stripe
+pyjwt
+
+# Development
+pytest
+pytest-asyncio
+alembic  # Database migrations

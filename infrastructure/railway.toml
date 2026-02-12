@@ -1,0 +1,38 @@
+# Théoria - Railway Configuration
+# Alternative deployment to Railway (simpler than Render)
+#
+# Usage:
+# 1. Install Railway CLI: npm install -g @railway/cli
+# 2. Login: railway login
+# 3. Link project: railway link
+# 4. Deploy: railway up
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "infrastructure/Dockerfile"
+
+[deploy]
+# Health check endpoint
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+
+# Restart policy
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Number of replicas (scale horizontally)
+# numReplicas = 2  # Enable for HA
+
+# Startup configuration
+startCommand = "python run_api.py"
+
+# Environment variables (set via Railway dashboard or CLI)
+# railway variables set MISTRAL_API_KEY="xxx"
+
+[networking]
+# Railway provides automatic HTTPS
+# Custom domains configured in dashboard
+
+# Database and Redis are provisioned via Railway Add-ons
+# Run: railway add --database postgres
+# Run: railway add --database redis

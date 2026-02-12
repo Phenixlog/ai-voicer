@@ -1,0 +1,7 @@
+interface:
+  display_name: "Frontend Design SaaS"
+  short_description: "Premium SaaS UI redesigns and implementation"
+  default_prompt: "Use $frontend-design-saas to redesign my landing page and app UI into a modern SaaS aesthetic."
+
+policy:
+  allow_implicit_invocation: true

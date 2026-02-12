@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Théoria - Cards Component Library</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { font-family: 'Inter', -apple-system, sans-serif; }
+    
+    .component-section {
+      @apply mb-12;
+    }
+    .component-label {
+      @apply text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen p-8">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-900 mb-2">Cards</h1>
+    <p class="text-slate-600 mb-12">Composants cards réutilisables pour Théoria.</p>
+
+    <!-- Basic Cards -->
+    <div class="component-section">
+      <div class="component-label">Basic Cards</div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <!-- Default -->
+        <div class="bg-white rounded-xl p-6 border border-slate-200">
+          <h3 class="font-semibold text-slate-900 mb-2">Card Default</h3>
+          <p class="text-sm text-slate-600">Carte simple avec bordure. Utilisée pour la plupart des contenus.</p>
+        </div>
+        
+        <!-- Hover Effect -->
+        <div class="bg-white rounded-xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer">
+          <h3 class="font-semibold text-slate-900 mb-2">Card Interactive</h3>
+          <p class="text-sm text-slate-600">Carte avec effet au survol. Pour les éléments cliquables.</p>
+        </div>
+        
+        <!-- Elevated -->
+        <div class="bg-white rounded-xl p-6 shadow-md">
+          <h3 class="font-semibold text-slate-900 mb-2">Card Elevated</h3>
+          <p class="text-sm text-slate-600">Carte avec ombre. Pour mettre en valeur du contenu important.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="component-section">
+      <div class="component-label">Feature Cards</div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="group bg-white rounded-2xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="zap" class="w-6 h-6 text-blue-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Ultra rapide</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">De la voix au texte en quelques secondes. La latence est minimale.</p>
+        </div>
+        
+        <div class="group bg-white rounded-2xl p-6 border border-slate-200 hover:border-emerald-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="sparkles" class="w-6 h-6 text-emerald-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Texte propre</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Ponctuation, structure, clarté. Un résultat publiable immédiatement.</p>
+        </div>
+        
+        <div class="group bg-white rounded-2xl p-6 border border-slate-200 hover:border-purple-300 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+          <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <i data-lucide="shield-check" class="w-6 h-6 text-purple-600"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 mb-2">Privé</h3>
+          <p class="text-slate-600 text-sm leading-relaxed">Vos données vous appartiennent. Chiffrement de bout en bout.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Cards -->
+    <div class="component-section">
+      <div class="component-label">Pricing Cards</div>
+      <div class="grid md:grid-cols-3 gap-6 max-w-4xl">
+        <!-- Free -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Free</h3>
+            <p class="text-slate-500 text-sm">Pour tester et usages légers</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold text-slate-900">0€</span>
+            <span class="text-slate-500">/mois</span>
+          </div>
+          <ul class="space-y-3 mb-6">
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span>30 minutes/mois</span>
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span>Transcription standard</span>
+            </li>
+          </ul>
+          <button class="w-full py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+            Télécharger
+          </button>
+        </div>
+        
+        <!-- Pro (Featured) -->
+        <div class="relative bg-white rounded-2xl p-6 border-2 border-blue-500 shadow-xl">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+            <span class="px-3 py-1 text-xs font-semibold text-white bg-blue-600 rounded-full">Populaire</span>
+          </div>
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Pro</h3>
+            <p class="text-slate-500 text-sm">Pour les créateurs réguliers</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold text-slate-900">12€</span>
+            <span class="text-slate-500">/mois</span>
+          </div>
+          <ul class="space-y-3 mb-6">
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span><strong>5 heures/mois</strong></span>
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span>Styles personnalisés</span>
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span>Support prioritaire</span>
+            </li>
+          </ul>
+          <button class="w-full py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all hover:shadow-lg">
+            Commencer
+          </button>
+        </div>
+        
+        <!-- Power -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200">
+          <div class="mb-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Power</h3>
+            <p class="text-slate-500 text-sm">Pour les power users</p>
+          </div>
+          <div class="mb-6">
+            <span class="text-4xl font-bold text-slate-900">29€</span>
+            <span class="text-slate-500">/mois</span>
+          </div>
+          <ul class="space-y-3 mb-6">
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span><strong>Illimité</strong></span>
+            </li>
+            <li class="flex items-center gap-3 text-sm text-slate-600">
+              <i data-lucide="check" class="w-4 h-4 text-emerald-500 flex-shrink-0"></i>
+              <span>Latence prioritaire</span>
+            </li>
+          </ul>
+          <button class="w-full py-2.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+            Contacter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="component-section">
+      <div class="component-label">Dashboard Cards</div>
+      <div class="grid md:grid-cols-4 gap-4">
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Usage ce mois</p>
+              <p class="text-2xl font-bold text-slate-900">2h 34m</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <i data-lucide="mic" class="w-5 h-5 text-blue-600"></i>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-emerald-600 font-medium flex items-center gap-1">
+              <i data-lucide="trending-up" class="w-4 h-4"></i>
+              +12%
+            </span>
+            <span class="text-slate-400">vs mois dernier</span>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Transcriptions</p>
+              <p class="text-2xl font-bold text-slate-900">847</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <i data-lucide="file-text" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-emerald-600 font-medium">99.2%</span>
+            <span class="text-slate-400">taux de succès</span>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Temps moyen</p>
+              <p class="text-2xl font-bold text-slate-900">3.2s</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+              <i data-lucide="zap" class="w-5 h-5 text-amber-600"></i>
+            </div>
+          </div>
+          <div class="text-sm text-slate-400">De la voix au texte</div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-5 border border-slate-200">
+          <div class="flex items-start justify-between mb-3">
+            <div>
+              <p class="text-sm text-slate-500 mb-1">Plan actuel</p>
+              <p class="text-2xl font-bold text-slate-900">Pro</p>
+            </div>
+            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <i data-lucide="crown" class="w-5 h-5 text-purple-600"></i>
+            </div>
+          </div>
+          <div class="text-sm text-slate-400">Renouvellement le 15/03</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Testimonial Cards -->
+    <div class="component-section">
+      <div class="component-label">Testimonial Cards</div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
+          <div class="flex items-center gap-1 mb-4">
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+            <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+          </div>
+          <p class="text-slate-700 mb-6 leading-relaxed">"Je rédigeais mes newsletters en 2h. Avec Théoria, c'est 30 minutes. Le texte sort propre, structuré."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold">ML</div>
+            <div>
+              <div class="font-semibold text-slate-900">Marie L.</div>
+              <div class="text-sm text-slate-500">Consultante freelance</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Card -->
+    <div class="component-section">
+      <div class="component-label">Settings Card</div>
+      <div class="max-w-2xl bg-white rounded-xl border border-slate-200 p-6">
+        <h2 class="font-semibold text-slate-900 mb-6">Profil</h2>
+        <div class="flex items-start gap-6">
+          <div class="relative">
+            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">JD</div>
+            <button class="absolute -bottom-1 -right-1 w-8 h-8 bg-white rounded-full shadow border border-slate-200 flex items-center justify-center hover:bg-slate-50">
+              <i data-lucide="camera" class="w-4 h-4 text-slate-600"></i>
+            </button>
+          </div>
+          <div class="flex-1 grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Prénom</label>
+              <input type="text" value="Jean" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-1">Nom</label>
+              <input type="text" value="Dupont" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
