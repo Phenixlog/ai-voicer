@@ -53,6 +53,7 @@ ENV PATH=/home/appuser/.local/bin:$PATH
 
 # Copy application code
 COPY --chown=appuser:appgroup src/ ./src/
+COPY --chown=appuser:appgroup web/ ./web/
 COPY --chown=appuser:appgroup run_api.py .
 
 # Create logs directory
