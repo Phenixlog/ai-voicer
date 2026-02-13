@@ -109,6 +109,10 @@ class DesktopAppController:
         success = self.auth.login(email=email.strip())
         if success:
             self._save_desktop_prefs()
+            # If an autostart daemon is already running from before login,
+            # restart it so it picks up fresh credentials immediately.
+            if self._list_daemon_pids():
+                self.reset_daemon_instances()
         return success
 
     def logout(self) -> None:

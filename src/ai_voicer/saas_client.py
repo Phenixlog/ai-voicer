@@ -41,9 +41,8 @@ class SaasAuthManager:
     
     def _load_credentials(self) -> SaasCredentials:
         """Load credentials from file."""
-        if self._credentials is not None:
-            return self._credentials
-        
+        # Always reload from disk so separate processes (desktop UI/daemon/autostart)
+        # see fresh credentials immediately after login/logout.
         if self.credentials_file.exists():
             try:
                 data = json.loads(self.credentials_file.read_text())
