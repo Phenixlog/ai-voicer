@@ -67,6 +67,8 @@ class PushToTalkDaemon:
         # if key release is missed by the OS, a new press force-stops recording.
         # then we ignore extra presses until the user releases once.
         self._hold_ignore_presses_until_release = False
+        # Tracks the physical key-down state in hold mode to ignore OS key-repeat.
+        self._hold_key_is_down = False
 
     def start(self) -> None:
         logging.info(
@@ -84,6 +86,7 @@ class PushToTalkDaemon:
         logging.info("Stopping daemon.")
         self.stopped.set()
         self._hold_ignore_presses_until_release = False
+        self._hold_key_is_down = False
         try:
             self.listener.stop()
         except Exception:
@@ -108,6 +111,11 @@ class PushToTalkDaemon:
         if self._hold_ignore_presses_until_release:
             return
 
+        # Ignore repeated on_press events while the key is still physically held.
+        if self._hold_key_is_down:
+            return
+        self._hold_key_is_down = True
+
         if self.capture.is_recording:
             logging.warning(
                 "Hold mode fallback triggered: forcing stop after missed key release."
@@ -124,6 +132,7 @@ class PushToTalkDaemon:
         if self.config.trigger_mode == "toggle":
             self._pressed_once = False
             return
+        self._hold_key_is_down = False
         if self._hold_ignore_presses_until_release:
             self._hold_ignore_presses_until_release = False
             return
