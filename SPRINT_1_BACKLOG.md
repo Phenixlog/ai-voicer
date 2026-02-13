@@ -12,6 +12,20 @@ Resultat attendu fin sprint:
 - hotkey operationnelle,
 - daemon auto-demarre au login.
 
+## 1.1) Statut de livraison (mise a jour)
+
+- S1-A1: complete (structure desktop app en package dedie).
+- S1-A2: complete (build macOS `.app` + `.zip` via script).
+- S1-A3: complete (script de release versionnee).
+- S1-B1: complete (login/logout desktop sans terminal).
+- S1-B2: complete (assistant permissions + ouverture settings macOS).
+- S1-B3: complete (settings backend/hotkey flow deja operationnel via config daemon).
+- S1-C1: complete (install/remove autostart LaunchAgent depuis UI).
+- S1-C2: complete (statut runtime visible dans desktop app).
+- S1-C3: complete (anti-blocage hold/toggle + filtre key-repeat).
+- S1-D1: complete (logs daemon locaux persistants).
+- S1-D2: complete (bloc diagnostics integre dans la desktop app).
+
 ## 2) Scope Sprint 1
 
 ## In

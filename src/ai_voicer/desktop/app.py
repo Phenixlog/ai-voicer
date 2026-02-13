@@ -22,8 +22,14 @@ class DesktopControlApp:
 
         self.backend_var = tk.StringVar(value=self.controller.backend_url)
         self.email_var = tk.StringVar(value="")
+        self.hotkey_var = tk.StringVar(value=self.controller.hotkey)
+        self.trigger_mode_var = tk.StringVar(value=self.controller.trigger_mode)
         self.status_var = tk.StringVar(value="Session: not logged in")
         self.daemon_var = tk.StringVar(value="Daemon: stopped")
+        self.mic_perm_var = tk.StringVar(value="Microphone: unknown")
+        self.ax_perm_var = tk.StringVar(value="Accessibility: unknown")
+        self.input_perm_var = tk.StringVar(value="Input monitoring: unknown")
+        self.diagnostics_var = tk.StringVar(value="Diagnostics: loading...")
 
         self._build_ui()
         self._refresh_status_once()
@@ -58,6 +64,13 @@ class DesktopControlApp:
         auth_buttons.grid(row=1, column=2, sticky="e", pady=(8, 0))
         tk.Button(auth_buttons, text="Login", command=self._login).pack(side=tk.LEFT)
         tk.Button(auth_buttons, text="Logout", command=self._logout).pack(side=tk.LEFT, padx=(6, 0))
+
+        tk.Label(cfg, text="Hotkey").grid(row=2, column=0, sticky="w", pady=(8, 0))
+        tk.Entry(cfg, textvariable=self.hotkey_var, width=24).grid(row=2, column=1, sticky="w", padx=(8, 8), pady=(8, 0))
+        settings_buttons = tk.Frame(cfg)
+        settings_buttons.grid(row=2, column=2, sticky="e", pady=(8, 0))
+        tk.OptionMenu(settings_buttons, self.trigger_mode_var, "hold", "toggle").pack(side=tk.LEFT)
+        tk.Button(settings_buttons, text="Save keys", command=self._save_hotkey_settings).pack(side=tk.LEFT, padx=(6, 0))
         cfg.columnconfigure(1, weight=1)
 
         status_frame = tk.Frame(main)
@@ -76,6 +89,49 @@ class DesktopControlApp:
             side=tk.LEFT, padx=(8, 0)
         )
         tk.Button(daemon_box, text="Refresh status", command=self._refresh_status_once).pack(side=tk.RIGHT)
+
+        onboarding = tk.LabelFrame(main, text="Permissions Onboarding (macOS)", padx=10, pady=10)
+        onboarding.pack(fill=tk.X, pady=(12, 0))
+        tk.Label(onboarding, textvariable=self.mic_perm_var, anchor="w").grid(row=0, column=0, sticky="w")
+        tk.Button(
+            onboarding,
+            text="Request microphone",
+            command=lambda: self._request_permission("microphone"),
+        ).grid(row=0, column=1, sticky="e")
+        tk.Button(
+            onboarding,
+            text="Open settings",
+            command=lambda: self._open_permission_settings("Microphone"),
+        ).grid(row=0, column=2, sticky="e", padx=(6, 0))
+
+        tk.Label(onboarding, textvariable=self.ax_perm_var, anchor="w").grid(row=1, column=0, sticky="w", pady=(6, 0))
+        tk.Button(
+            onboarding,
+            text="Request accessibility",
+            command=lambda: self._request_permission("accessibility"),
+        ).grid(row=1, column=1, sticky="e", pady=(6, 0))
+        tk.Button(
+            onboarding,
+            text="Open settings",
+            command=lambda: self._open_permission_settings("Accessibility"),
+        ).grid(row=1, column=2, sticky="e", padx=(6, 0), pady=(6, 0))
+
+        tk.Label(onboarding, textvariable=self.input_perm_var, anchor="w").grid(row=2, column=0, sticky="w", pady=(6, 0))
+        tk.Button(
+            onboarding,
+            text="Request input monitoring",
+            command=lambda: self._request_permission("input_monitoring"),
+        ).grid(row=2, column=1, sticky="e", pady=(6, 0))
+        tk.Button(
+            onboarding,
+            text="Open settings",
+            command=lambda: self._open_permission_settings("ListenEvent"),
+        ).grid(row=2, column=2, sticky="e", padx=(6, 0), pady=(6, 0))
+        onboarding.columnconfigure(0, weight=1)
+
+        diagnostics = tk.LabelFrame(main, text="Diagnostics", padx=10, pady=10)
+        diagnostics.pack(fill=tk.X, pady=(12, 0))
+        tk.Label(diagnostics, textvariable=self.diagnostics_var, justify=tk.LEFT, anchor="w").pack(fill=tk.X)
 
         logs = tk.LabelFrame(main, text="Runtime Logs", padx=10, pady=10)
         logs.pack(fill=tk.BOTH, expand=True, pady=(12, 0))
@@ -125,6 +181,19 @@ class DesktopControlApp:
         self._append_log("Logged out.")
         self._refresh_status_once()
 
+    def _save_hotkey_settings(self) -> None:
+        try:
+            hotkey, mode = self.controller.set_local_settings(
+                self.hotkey_var.get(),
+                self.trigger_mode_var.get(),
+            )
+            self.hotkey_var.set(hotkey)
+            self.trigger_mode_var.set(mode)
+            self._append_log(f"Local daemon settings saved: hotkey={hotkey}, mode={mode}")
+            self._refresh_status_once()
+        except Exception as exc:
+            messagebox.showerror("Settings", str(exc))
+
     def _start_daemon(self) -> None:
         self._apply_backend_url()
         try:
@@ -164,11 +233,45 @@ class DesktopControlApp:
             self.status_var.set(f"Session: logged in as {status.email}")
         else:
             self.status_var.set("Session: not logged in")
-        self.daemon_var.set("Daemon: running" if status.daemon_running else "Daemon: stopped")
+        autostart = "enabled" if self.controller.is_autostart_installed() else "disabled"
+        daemon_state = "running" if status.daemon_running else "stopped"
+        self.daemon_var.set(f"Daemon: {daemon_state} | Autostart: {autostart}")
+        self._refresh_permissions()
+        self._refresh_diagnostics()
 
     def _tick_status_refresh(self) -> None:
         self._refresh_status_once()
         self.root.after(1000, self._tick_status_refresh)
+
+    def _refresh_permissions(self) -> None:
+        state = self.controller.get_permission_state()
+        self.mic_perm_var.set(f"Microphone: {state.microphone}")
+        self.ax_perm_var.set(f"Accessibility: {state.accessibility}")
+        self.input_perm_var.set(f"Input monitoring: {state.input_monitoring}")
+
+    def _request_permission(self, name: str) -> None:
+        state = self.controller.request_permission(name)
+        self.mic_perm_var.set(f"Microphone: {state.microphone}")
+        self.ax_perm_var.set(f"Accessibility: {state.accessibility}")
+        self.input_perm_var.set(f"Input monitoring: {state.input_monitoring}")
+        self._append_log(f"Permission request attempted: {name}")
+
+    def _open_permission_settings(self, section: str) -> None:
+        self.controller.open_permission_settings(section)
+        self._append_log(f"Opened macOS settings: Privacy_{section}")
+
+    def _refresh_diagnostics(self) -> None:
+        d = self.controller.diagnostics()
+        auth = "logged_in" if d.is_logged_in else "logged_out"
+        self.diagnostics_var.set(
+            (
+                f"Auth={auth} | Backend={d.backend_url}\n"
+                f"Hotkey={d.hotkey} | Trigger mode={d.trigger_mode}\n"
+                f"Autostart={'yes' if d.autostart_installed else 'no'} | "
+                f"Credentials={d.credentials_file}\n"
+                f"Log file={d.daemon_log_file}"
+            )
+        )
 
     def _on_close(self) -> None:
         try:

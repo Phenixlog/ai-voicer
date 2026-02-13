@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="${THEORIA_ROOT_DIR:-$ROOT_DIR}"
 PLIST_PATH="$HOME/Library/LaunchAgents/com.keyvan.theoria-saas-daemon.plist"
 LOG_DIR="$HOME/Library/Logs/ai-voicer"
 if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
@@ -10,6 +11,7 @@ else
   DEFAULT_PYTHON="$(command -v python3)"
 fi
 PYTHON_BIN="${PYTHON_BIN:-$DEFAULT_PYTHON}"
+BACKEND_URL="${AI_VOICER_BACKEND_URL:-}"
 
 mkdir -p "$HOME/Library/LaunchAgents"
 mkdir -p "$LOG_DIR"
@@ -33,6 +35,8 @@ cat > "$PLIST_PATH" <<EOF
   <dict>
     <key>PYTHONPATH</key>
     <string>$ROOT_DIR/src</string>
+    <key>AI_VOICER_BACKEND_URL</key>
+    <string>$BACKEND_URL</string>
   </dict>
 
   <key>WorkingDirectory</key>

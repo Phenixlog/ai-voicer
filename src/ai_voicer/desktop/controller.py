@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import threading
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Optional
 
 from ..config import load_config
 from ..saas_client import SaasAuthManager
+from .permissions import PermissionState, get_permission_state, open_privacy_settings, request_permission
 
 
 LogFn = Callable[[str], None]
@@ -19,9 +22,25 @@ LogFn = Callable[[str], None]
 @dataclass
 class DesktopStatus:
     backend_url: str
+    hotkey: str
+    trigger_mode: str
     is_logged_in: bool
     email: str
     daemon_running: bool
+
+
+@dataclass
+class DesktopDiagnostics:
+    backend_url: str
+    hotkey: str
+    trigger_mode: str
+    is_logged_in: bool
+    email: str
+    daemon_running: bool
+    autostart_installed: bool
+    credentials_file: str
+    daemon_log_file: str
+    permissions: PermissionState
 
 
 class DesktopAppController:
@@ -33,13 +52,27 @@ class DesktopAppController:
         self._daemon_proc: Optional[subprocess.Popen[str]] = None
         self._daemon_log_thread: Optional[threading.Thread] = None
         self._log_fn: Optional[LogFn] = None
+        self.config_dir = Path.home() / "Library" / "Application Support" / "Theoria"
+        self.config_dir.mkdir(parents=True, exist_ok=True)
+        self.desktop_config_file = self.config_dir / "desktop_app.json"
+        self.daemon_log_file = self.config_dir / "daemon.log"
+        self._permissions_cache: Optional[PermissionState] = None
+        self._permissions_cached_at: float = 0.0
 
+        prefs = self._load_desktop_prefs()
+        persisted_backend = prefs.get("backend_url")
         try:
             config = load_config()
             default_backend = config.backend_url
+            default_hotkey = config.hotkey
+            default_trigger_mode = config.trigger_mode
         except Exception:
             default_backend = None
-        self.backend_url = default_backend or "http://127.0.0.1:8090"
+            default_hotkey = "f8"
+            default_trigger_mode = "hold"
+        self.backend_url = persisted_backend or default_backend or "http://127.0.0.1:8090"
+        self.hotkey = str(prefs.get("hotkey") or default_hotkey or "f8").lower()
+        self.trigger_mode = str(prefs.get("trigger_mode") or default_trigger_mode or "hold").lower()
         self.auth = SaasAuthManager(self.backend_url)
 
     def _resolve_python_bin(self) -> str:
@@ -57,10 +90,26 @@ class DesktopAppController:
 
         self.backend_url = url.rstrip("/")
         self.auth = SaasAuthManager(self.backend_url)
+        self._save_desktop_prefs()
         return self.backend_url
 
+    def set_local_settings(self, hotkey: str, trigger_mode: str) -> tuple[str, str]:
+        normalized_hotkey = hotkey.strip().lower()
+        normalized_mode = trigger_mode.strip().lower()
+        if not normalized_hotkey:
+            raise ValueError("Hotkey is required.")
+        if normalized_mode not in {"hold", "toggle"}:
+            raise ValueError("Trigger mode must be hold or toggle.")
+        self.hotkey = normalized_hotkey
+        self.trigger_mode = normalized_mode
+        self._save_desktop_prefs()
+        return self.hotkey, self.trigger_mode
+
     def login(self, email: str) -> bool:
-        return self.auth.login(email=email.strip())
+        success = self.auth.login(email=email.strip())
+        if success:
+            self._save_desktop_prefs()
+        return success
 
     def logout(self) -> None:
         self.auth.logout()
@@ -70,6 +119,8 @@ class DesktopAppController:
         daemon_running = bool(self._daemon_proc and self._daemon_proc.poll() is None)
         return DesktopStatus(
             backend_url=self.backend_url,
+            hotkey=self.hotkey,
+            trigger_mode=self.trigger_mode,
             is_logged_in=self.auth.is_logged_in(),
             email=creds.email or "",
             daemon_running=daemon_running,
@@ -84,6 +135,8 @@ class DesktopAppController:
         env = {
             "PYTHONPATH": str(self.root_dir / "src"),
             "AI_VOICER_BACKEND_URL": self.backend_url,
+            "AI_VOICER_HOTKEY": self.hotkey,
+            "AI_VOICER_TRIGGER_MODE": self.trigger_mode,
         }
 
         # Keep system env and override only required values.
@@ -106,9 +159,17 @@ class DesktopAppController:
         proc = self._daemon_proc
         if not proc or not proc.stdout:
             return
+        self.daemon_log_file.parent.mkdir(parents=True, exist_ok=True)
+        with self.daemon_log_file.open("a", encoding="utf-8") as log_file:
+            log_file.write("=== daemon session start ===\n")
+            log_file.flush()
         for line in proc.stdout:
+            with self.daemon_log_file.open("a", encoding="utf-8") as log_file:
+                log_file.write(line)
             if self._log_fn:
                 self._log_fn(line.rstrip())
+        with self.daemon_log_file.open("a", encoding="utf-8") as log_file:
+            log_file.write("=== daemon session end ===\n")
         if self._log_fn:
             self._log_fn("Daemon stopped.")
 
@@ -133,7 +194,13 @@ class DesktopAppController:
             text=True,
             capture_output=True,
             check=False,
-            env={**os.environ, "AI_VOICER_BACKEND_URL": self.backend_url},
+            env={
+                **os.environ,
+                "AI_VOICER_BACKEND_URL": self.backend_url,
+                "AI_VOICER_HOTKEY": self.hotkey,
+                "AI_VOICER_TRIGGER_MODE": self.trigger_mode,
+                "THEORIA_ROOT_DIR": str(self.root_dir),
+            },
         )
         if result.returncode != 0:
             raise RuntimeError(result.stderr.strip() or "Failed to install LaunchAgent.")
@@ -151,3 +218,59 @@ class DesktopAppController:
         if result.returncode != 0:
             raise RuntimeError(result.stderr.strip() or "Failed to remove LaunchAgent.")
         return result.stdout.strip()
+
+    def is_autostart_installed(self) -> bool:
+        plist_path = Path.home() / "Library" / "LaunchAgents" / "com.keyvan.theoria-saas-daemon.plist"
+        return plist_path.exists()
+
+    def get_permission_state(self) -> PermissionState:
+        now = time.time()
+        if self._permissions_cache and (now - self._permissions_cached_at) < 5.0:
+            return self._permissions_cache
+        state = get_permission_state()
+        self._permissions_cache = state
+        self._permissions_cached_at = now
+        return state
+
+    def request_permission(self, permission: str) -> PermissionState:
+        state = request_permission(permission)
+        self._permissions_cache = state
+        self._permissions_cached_at = time.time()
+        return state
+
+    def open_permission_settings(self, section: str) -> None:
+        open_privacy_settings(section)
+
+    def diagnostics(self) -> DesktopDiagnostics:
+        status = self.status()
+        return DesktopDiagnostics(
+            backend_url=status.backend_url,
+            hotkey=status.hotkey,
+            trigger_mode=status.trigger_mode,
+            is_logged_in=status.is_logged_in,
+            email=status.email,
+            daemon_running=status.daemon_running,
+            autostart_installed=self.is_autostart_installed(),
+            credentials_file=str(self.auth.credentials_file),
+            daemon_log_file=str(self.daemon_log_file),
+            permissions=self.get_permission_state(),
+        )
+
+    def _load_desktop_prefs(self) -> dict:
+        if not self.desktop_config_file.exists():
+            return {}
+        try:
+            payload = json.loads(self.desktop_config_file.read_text(encoding="utf-8"))
+            if isinstance(payload, dict):
+                return payload
+        except Exception:
+            return {}
+        return {}
+
+    def _save_desktop_prefs(self) -> None:
+        payload = {
+            "backend_url": self.backend_url.rstrip("/"),
+            "hotkey": self.hotkey,
+            "trigger_mode": self.trigger_mode,
+        }
+        self.desktop_config_file.write_text(json.dumps(payload, indent=2), encoding="utf-8")
