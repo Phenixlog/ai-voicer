@@ -1,8 +1,8 @@
 # Core dependencies (existing)
 mistralai
-sounddevice
+sounddevice; platform_system == "Darwin"
 numpy
-pynput
+pynput; platform_system == "Darwin"
 python-dotenv
 fastapi
 uvicorn
