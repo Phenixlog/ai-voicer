@@ -5,6 +5,7 @@ from __future__ import annotations
 import subprocess
 import time
 from dataclasses import dataclass
+import threading
 
 
 @dataclass
@@ -34,27 +35,25 @@ def _check_microphone() -> str:
             return "denied"
         return "unknown"
     except Exception:
-        pass
-
-    try:
-        import sounddevice as sd  # type: ignore
-
-        stream = sd.InputStream(samplerate=16000, channels=1, dtype="int16")
-        stream.start()
-        time.sleep(0.05)
-        stream.stop()
-        stream.close()
-        return "granted"
-    except Exception as exc:
-        msg = str(exc).lower()
-        if "not permitted" in msg or "not authorized" in msg or "permission" in msg:
-            return "denied"
         return "unknown"
 
 
 def _request_microphone() -> str:
-    # Prompt can be triggered by starting an input stream.
-    return _check_microphone()
+    try:
+        from AVFoundation import AVCaptureDevice, AVMediaTypeAudio  # type: ignore
+
+        done = threading.Event()
+
+        def callback(granted: bool) -> None:
+            del granted
+            done.set()
+
+        AVCaptureDevice.requestAccessForMediaType_completionHandler_(AVMediaTypeAudio, callback)
+        done.wait(timeout=2.0)
+        return _check_microphone()
+    except Exception:
+        open_privacy_settings("Microphone")
+        return "unknown"
 
 
 def _check_accessibility() -> str:

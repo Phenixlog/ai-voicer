@@ -32,7 +32,7 @@ class DesktopControlApp:
         self.diagnostics_var = tk.StringVar(value="Diagnostics: loading...")
 
         self._build_ui()
-        self._refresh_status_once()
+        self.root.after(120, self._refresh_status_once)
         self.root.after(150, self._flush_logs)
         self.root.after(1000, self._tick_status_refresh)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
