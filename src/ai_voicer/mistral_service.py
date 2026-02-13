@@ -60,6 +60,10 @@ def _extract_chat_text(response: Any) -> str:
 
 class MistralTranscriptionService:
     def __init__(self, config: AppConfig):
+        if not config.mistral_api_key:
+            raise RuntimeError(
+                "MISTRAL_API_KEY is required for local direct Mistral transcription mode."
+            )
         self.config = config
         self.client = Mistral(api_key=config.mistral_api_key)
 

@@ -24,6 +24,8 @@ def main() -> None:
         os.environ.setdefault("AI_VOICER_API_PORT", railway_port)
 
     config = load_config()
+    if not config.mistral_api_key:
+        raise RuntimeError("MISTRAL_API_KEY is required to run the SaaS API server.")
     setup_logging(config.log_level)
     app = create_saas_api_app()
     uvicorn.run(

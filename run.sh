@@ -22,6 +22,10 @@ case $COMMAND in
         echo "🎙️  Starting Théoria SaaS Daemon..."
         exec "$PYTHON" "$SCRIPT_DIR/run_saas_daemon.py" "$@"
         ;;
+    desktop|ui)
+        echo "🖥️  Starting Théoria Desktop App..."
+        exec "$PYTHON" "$SCRIPT_DIR/run_desktop_app.py" "$@"
+        ;;
     login|l)
         echo "🔑 Login to Théoria SaaS..."
         exec "$PYTHON" "$SCRIPT_DIR/run_saas_daemon.py" login "$@"
@@ -43,6 +47,7 @@ Usage: ./run.sh <command> [args]
 Commands:
   saas-api, sa    Run SaaS API (auth/billing/usage)
   saas-daemon, sd Run SaaS daemon (needs login)
+  desktop, ui     Run desktop control app (no terminal workflow)
   login, l        Login to SaaS (./run.sh login email@example.com)
   status, s       Show SaaS status
   test            Run tests
@@ -52,6 +57,7 @@ Examples:
   ./run.sh saas-api            # Start SaaS API server
   ./run.sh login user@test.com # Login
   ./run.sh sd run              # Run SaaS daemon
+  ./run.sh desktop             # Open desktop control app
 EOF
         ;;
     *)

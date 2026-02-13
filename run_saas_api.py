@@ -16,6 +16,8 @@ from ai_voicer.logging_setup import setup_logging
 
 def main():
     config = load_config()
+    if not config.mistral_api_key:
+        raise RuntimeError("MISTRAL_API_KEY is required to run the SaaS API server.")
     setup_logging(config.log_level)
     
     app = create_saas_api_app()
