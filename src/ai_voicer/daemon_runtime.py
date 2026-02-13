@@ -69,6 +69,10 @@ class PushToTalkDaemon:
         self._hold_ignore_presses_until_release = False
         # Tracks the physical key-down state in hold mode to ignore OS key-repeat.
         self._hold_key_is_down = False
+        # Time of last hotkey press event seen in hold mode.
+        self._hold_last_press_ts = 0.0
+        # Gap required to treat a new press as recovery for missed release.
+        self._hold_recovery_press_gap_s = 0.8
 
     def start(self) -> None:
         logging.info(
@@ -87,6 +91,7 @@ class PushToTalkDaemon:
         self.stopped.set()
         self._hold_ignore_presses_until_release = False
         self._hold_key_is_down = False
+        self._hold_last_press_ts = 0.0
         try:
             self.listener.stop()
         except Exception:
@@ -108,13 +113,29 @@ class PushToTalkDaemon:
                 self._start_recording()
             return
 
+        now = time.monotonic()
         if self._hold_ignore_presses_until_release:
+            self._hold_last_press_ts = now
             return
 
-        # Ignore repeated on_press events while the key is still physically held.
         if self._hold_key_is_down:
+            # If release was missed, a fresh press after a short gap recovers safely.
+            if (
+                self.capture.is_recording
+                and (now - self._hold_last_press_ts) >= self._hold_recovery_press_gap_s
+            ):
+                logging.warning(
+                    "Hold mode recovery triggered: forcing stop after missed key release."
+                )
+                self._hold_last_press_ts = now
+                self._stop_and_queue()
+                self._hold_ignore_presses_until_release = True
+                return
+            # Ignore repeated on_press events while key is still held.
+            self._hold_last_press_ts = now
             return
         self._hold_key_is_down = True
+        self._hold_last_press_ts = now
 
         if self.capture.is_recording:
             logging.warning(
@@ -133,6 +154,7 @@ class PushToTalkDaemon:
             self._pressed_once = False
             return
         self._hold_key_is_down = False
+        self._hold_last_press_ts = 0.0
         if self._hold_ignore_presses_until_release:
             self._hold_ignore_presses_until_release = False
             return
