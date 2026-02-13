@@ -116,7 +116,7 @@ class DesktopAppController:
 
     def status(self) -> DesktopStatus:
         creds = self.auth._load_credentials()
-        daemon_running = bool(self._daemon_proc and self._daemon_proc.poll() is None)
+        daemon_running = bool(self._list_daemon_pids())
         return DesktopStatus(
             backend_url=self.backend_url,
             hotkey=self.hotkey,
@@ -127,8 +127,11 @@ class DesktopAppController:
         )
 
     def start_daemon(self, log_fn: LogFn) -> None:
-        if self._daemon_proc and self._daemon_proc.poll() is None:
-            raise RuntimeError("Daemon is already running.")
+        if self._list_daemon_pids():
+            raise RuntimeError(
+                "Daemon is already running (autostart or terminal instance). "
+                "Stop existing daemon before starting a new one."
+            )
         if not self.auth.is_logged_in():
             raise RuntimeError("Login required before starting daemon.")
 
@@ -255,6 +258,36 @@ class DesktopAppController:
             daemon_log_file=str(self.daemon_log_file),
             permissions=self.get_permission_state(),
         )
+
+    def reset_daemon_instances(self) -> str:
+        """Reset duplicate daemon/hud processes and restart launch agent if installed."""
+        root_pattern = f"{self.root_dir}/run_saas_daemon.py run"
+        subprocess.run(["pkill", "-f", root_pattern], check=False)
+        subprocess.run(["pkill", "-f", "ai_voicer/hud_process.py"], check=False)
+        if self.is_autostart_installed():
+            uid = str(os.getuid())
+            domain = f"gui/{uid}/com.keyvan.theoria-saas-daemon"
+            subprocess.run(["launchctl", "kickstart", "-k", domain], check=False)
+            return "Daemon reset done. LaunchAgent restarted."
+        return "Daemon reset done. Start daemon manually from the app."
+
+    def _list_daemon_pids(self) -> list[int]:
+        pattern = f"{self.root_dir}/run_saas_daemon.py run"
+        result = subprocess.run(
+            ["pgrep", "-f", pattern],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0 or not result.stdout.strip():
+            return []
+        pids: list[int] = []
+        for raw in result.stdout.splitlines():
+            try:
+                pids.append(int(raw.strip()))
+            except ValueError:
+                continue
+        return pids
 
     def _load_desktop_prefs(self) -> dict:
         if not self.desktop_config_file.exists():

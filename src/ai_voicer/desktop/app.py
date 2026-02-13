@@ -88,6 +88,7 @@ class DesktopControlApp:
         tk.Button(daemon_box, text="Remove autostart", command=self._uninstall_autostart).pack(
             side=tk.LEFT, padx=(8, 0)
         )
+        tk.Button(daemon_box, text="Reset daemon", command=self._reset_daemon).pack(side=tk.LEFT, padx=(8, 0))
         tk.Button(daemon_box, text="Refresh status", command=self._refresh_status_once).pack(side=tk.RIGHT)
 
         onboarding = tk.LabelFrame(main, text="Permissions Onboarding (macOS)", padx=10, pady=10)
@@ -226,6 +227,14 @@ class DesktopControlApp:
                 self._append_log(out)
         except Exception as exc:
             messagebox.showerror("Remove autostart", str(exc))
+
+    def _reset_daemon(self) -> None:
+        try:
+            out = self.controller.reset_daemon_instances()
+            self._append_log(out)
+            self._refresh_status_once()
+        except Exception as exc:
+            messagebox.showerror("Reset daemon", str(exc))
 
     def _refresh_status_once(self) -> None:
         status = self.controller.status()
