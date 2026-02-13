@@ -63,6 +63,10 @@ class PushToTalkDaemon:
         self.worker = threading.Thread(target=self._worker_loop, daemon=True)
         self.listener = keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
         self._pressed_once = False
+        # Hold mode safety latch:
+        # if key release is missed by the OS, a new press force-stops recording.
+        # then we ignore extra presses until the user releases once.
+        self._hold_ignore_presses_until_release = False
 
     def start(self) -> None:
         logging.info(
@@ -79,6 +83,7 @@ class PushToTalkDaemon:
     def stop(self) -> None:
         logging.info("Stopping daemon.")
         self.stopped.set()
+        self._hold_ignore_presses_until_release = False
         try:
             self.listener.stop()
         except Exception:
@@ -99,8 +104,18 @@ class PushToTalkDaemon:
             else:
                 self._start_recording()
             return
-        if self.capture.is_recording:
+
+        if self._hold_ignore_presses_until_release:
             return
+
+        if self.capture.is_recording:
+            logging.warning(
+                "Hold mode fallback triggered: forcing stop after missed key release."
+            )
+            self._stop_and_queue()
+            self._hold_ignore_presses_until_release = True
+            return
+
         self._start_recording()
 
     def _on_release(self, key) -> None:
@@ -108,6 +123,9 @@ class PushToTalkDaemon:
             return
         if self.config.trigger_mode == "toggle":
             self._pressed_once = False
+            return
+        if self._hold_ignore_presses_until_release:
+            self._hold_ignore_presses_until_release = False
             return
         if not self.capture.is_recording:
             return
