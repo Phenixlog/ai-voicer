@@ -18,38 +18,46 @@ class AudioCaptureConfig:
 class HoldToRecordCapture:
     def __init__(self, config: AudioCaptureConfig):
         self.config = config
-        self.audio_lock = threading.Lock()
-        self.audio_chunks: list[bytes] = []
-        self.stream: Optional[sd.InputStream] = None
-        self.is_recording = False
+        self._lock = threading.Lock()
+        self._audio_chunks: list[bytes] = []
+        self._stream: Optional[sd.InputStream] = None
+        self._recording = False
+
+    @property
+    def is_recording(self) -> bool:
+        return self._recording
 
     def _audio_callback(self, indata, frames, callback_time, status) -> None:
         del frames, callback_time, status
-        with self.audio_lock:
-            self.audio_chunks.append(indata.copy().tobytes())
+        with self._lock:
+            if self._recording:
+                self._audio_chunks.append(indata.copy().tobytes())
 
     def start(self) -> None:
-        with self.audio_lock:
-            self.audio_chunks = []
-        self.stream = sd.InputStream(
-            samplerate=self.config.sample_rate,
-            channels=self.config.channels,
-            dtype="int16",
-            callback=self._audio_callback,
-        )
-        self.stream.start()
-        self.is_recording = True
+        with self._lock:
+            self._audio_chunks = []
+            self._stream = sd.InputStream(
+                samplerate=self.config.sample_rate,
+                channels=self.config.channels,
+                dtype="int16",
+                callback=self._audio_callback,
+            )
+            self._stream.start()
+            self._recording = True
 
     def stop_to_wav(self) -> Optional[str]:
-        if self.stream is not None:
-            self.stream.stop()
-            self.stream.close()
-        self.stream = None
-        self.is_recording = False
+        with self._lock:
+            stream = self._stream
+            self._stream = None
+            self._recording = False
+            chunks = list(self._audio_chunks)
+            self._audio_chunks = []
 
-        with self.audio_lock:
-            chunks = list(self.audio_chunks)
-            self.audio_chunks = []
+        if stream is not None:
+            try:
+                stream.stop()
+            finally:
+                stream.close()
 
         if not chunks:
             return None
@@ -69,10 +77,14 @@ class HoldToRecordCapture:
         return path
 
     def stop_discard(self) -> None:
-        if self.stream is not None:
-            self.stream.stop()
-            self.stream.close()
-        self.stream = None
-        self.is_recording = False
-        with self.audio_lock:
-            self.audio_chunks = []
+        with self._lock:
+            stream = self._stream
+            self._stream = None
+            self._recording = False
+            self._audio_chunks = []
+
+        if stream is not None:
+            try:
+                stream.stop()
+            finally:
+                stream.close()

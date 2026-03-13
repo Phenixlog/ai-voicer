@@ -12,8 +12,6 @@ from AppKit import (
     NSBackingStoreBuffered,
     NSColor,
     NSFont,
-    NSProgressIndicator,
-    NSProgressIndicatorStyleBar,
     NSScreen,
     NSStatusWindowLevel,
     NSTextField,
@@ -31,16 +29,18 @@ class HUDController:
         self._state = "idle"
         self.window = None
         self.label = None
-        self.progress = None
+        self.dot = None
         self.content = None
         self._build_window()
 
     def _build_window(self) -> None:
-        width = 360
-        height = 84
+        width = 160
+        height = 36
         screen = NSScreen.mainScreen().frame()
+        visible = NSScreen.mainScreen().visibleFrame()
+        # Position just below menu bar / notch, centered horizontally
         x = (screen.size.width - width) / 2.0
-        y = (screen.size.height - height) / 2.0
+        y = visible.origin.y + visible.size.height - height - 6
 
         self.window = NSWindow.alloc().initWithContentRect_styleMask_backing_defer_(
             NSMakeRect(x, y, width, height),
@@ -58,28 +58,33 @@ class HUDController:
         content: NSView = self.window.contentView()
         self.content = content
         content.setWantsLayer_(True)
-        content.layer().setCornerRadius_(22.0)
+        content.layer().setCornerRadius_(18.0)
         content.layer().setMasksToBounds_(True)
         content.layer().setBorderWidth_(1.0)
-        content.layer().setBorderColor_(NSColor.colorWithCalibratedWhite_alpha_(1.0, 0.12).CGColor())
-        content.layer().setBackgroundColor_(NSColor.colorWithCalibratedWhite_alpha_(0.08, 0.93).CGColor())
+        content.layer().setBorderColor_(
+            NSColor.colorWithCalibratedWhite_alpha_(1.0, 0.08).CGColor()
+        )
+        content.layer().setBackgroundColor_(
+            NSColor.colorWithCalibratedRed_green_blue_alpha_(0.1, 0.1, 0.1, 0.75).CGColor()
+        )
 
+        # Small colored dot (8x8, fully rounded)
+        self.dot = NSView.alloc().initWithFrame_(NSMakeRect(14, 14, 8, 8))
+        self.dot.setWantsLayer_(True)
+        self.dot.layer().setCornerRadius_(4.0)
+        self.dot.layer().setBackgroundColor_(
+            NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.9, 0.45, 1.0).CGColor()
+        )
+        content.addSubview_(self.dot)
+
+        # Short label next to the dot
         self.label = NSTextField.labelWithString_("Pret")
-        self.label.setFrame_(NSMakeRect(24, 50, 312, 20))
-        self.label.setTextColor_(NSColor.colorWithCalibratedWhite_alpha_(0.96, 1.0))
-        self.label.setFont_(NSFont.systemFontOfSize_(15))
+        self.label.setFrame_(NSMakeRect(30, 8, 116, 20))
+        self.label.setTextColor_(
+            NSColor.colorWithCalibratedWhite_alpha_(1.0, 0.9)
+        )
+        self.label.setFont_(NSFont.systemFontOfSize_(12))
         content.addSubview_(self.label)
-
-        self.progress = NSProgressIndicator.alloc().initWithFrame_(NSMakeRect(24, 22, 312, 14))
-        self.progress.setStyle_(NSProgressIndicatorStyleBar)
-        self.progress.setIndeterminate_(True)
-        self.progress.setDisplayedWhenStopped_(False)
-        self.progress.setUsesThreadedAnimation_(True)
-        self.progress.setWantsLayer_(True)
-        self.progress.layer().setCornerRadius_(7.0)
-        self.progress.layer().setMasksToBounds_(True)
-        self.progress.layer().setBackgroundColor_(NSColor.colorWithCalibratedWhite_alpha_(1.0, 0.10).CGColor())
-        content.addSubview_(self.progress)
 
     def apply_event(self, payload: dict[str, Any]) -> None:
         state = payload.get("state", "idle")
@@ -89,58 +94,48 @@ class HUDController:
             NSApp().terminate_(None)
             return
         if state == "recording":
-            self._show(text or "Ecoute...", animate=True)
+            self._show(text or "Ecoute...")
             return
         if state == "transcribing":
-            self._show(text or "Transcription...", animate=True)
+            self._show(text or "Transcription...")
             return
         if state == "ready":
-            self._show(text or "Pret", animate=False)
+            self._show(text or "Collé")
             self._auto_hide(1.0)
             return
         if state == "error":
-            self._show(text or "Erreur", animate=False)
+            self._show(text or "Erreur")
             self._auto_hide(1.8)
             return
 
         self._hide()
 
-    def _show(self, text: str, animate: bool) -> None:
+    def _show(self, text: str) -> None:
         self._hide_gen += 1
         self._state = "active"
         self.label.setStringValue_(text)
         self._apply_palette(text)
-        if animate:
-            self.progress.startAnimation_(None)
-        else:
-            self.progress.stopAnimation_(None)
         # Do not steal focus (prevents menu-bar title flicker).
         self.window.orderFront_(None)
 
     def _hide(self) -> None:
         self._hide_gen += 1
         self._state = "idle"
-        self.progress.stopAnimation_(None)
         self.window.orderOut_(None)
 
     def _apply_palette(self, text: str) -> None:
-        if not self.content:
+        if not self.dot:
             return
         low = text.lower()
         if "ecoute" in low:
-            bg = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.22, 0.08, 0.10, 0.93)
-            border = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.32, 0.32, 0.42)
+            dot_color = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.3, 0.3, 1.0)
         elif "transcription" in low:
-            bg = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.22, 0.16, 0.06, 0.93)
-            border = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.72, 0.30, 0.42)
+            dot_color = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.7, 0.3, 1.0)
         elif "erreur" in low or "echec" in low:
-            bg = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.24, 0.07, 0.07, 0.93)
-            border = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.30, 0.30, 0.45)
+            dot_color = NSColor.colorWithCalibratedRed_green_blue_alpha_(1.0, 0.3, 0.3, 1.0)
         else:
-            bg = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.08, 0.20, 0.11, 0.93)
-            border = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.92, 0.50, 0.45)
-        self.content.layer().setBackgroundColor_(bg.CGColor())
-        self.content.layer().setBorderColor_(border.CGColor())
+            dot_color = NSColor.colorWithCalibratedRed_green_blue_alpha_(0.35, 0.9, 0.45, 1.0)
+        self.dot.layer().setBackgroundColor_(dot_color.CGColor())
 
     def _auto_hide(self, seconds: float) -> None:
         token = self._hide_gen
