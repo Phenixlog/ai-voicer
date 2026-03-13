@@ -11,6 +11,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { Billing } from './pages/Billing';
+import { LandingPage } from './pages/LandingPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -65,14 +66,17 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Landing page */}
+      <Route path="/landing" element={<LandingPage />} />
+
       {/* Public routes */}
-      <Route 
-        path="/login" 
+      <Route
+        path="/login"
         element={
           <PublicRoute>
             <Login />
           </PublicRoute>
-        } 
+        }
       />
 
       {/* Protected routes */}

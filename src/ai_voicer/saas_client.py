@@ -35,6 +35,10 @@ class SaasAuthManager:
         self.config_dir = config_dir or Path.home() / "Library" / "Application Support" / "Theoria"
         self.credentials_file = self.config_dir / "saas_credentials.json"
         self._credentials: Optional[SaasCredentials] = None
+        self._http = httpx.Client(
+            timeout=httpx.Timeout(30.0, connect=10.0, read=30.0),
+            limits=httpx.Limits(max_keepalive_connections=8, max_connections=16),
+        )
         
         # Ensure config directory exists
         self.config_dir.mkdir(parents=True, exist_ok=True)
@@ -62,25 +66,28 @@ class SaasAuthManager:
         os.chmod(self.credentials_file, 0o600)
     
     def is_logged_in(self) -> bool:
-        """Check if user is logged in with valid token."""
-        creds = self._load_credentials()
-        return creds.is_logged_in()
+        """Check if user has (or can recover) a valid access token."""
+        return bool(self.get_access_token())
     
-    def get_access_token(self) -> Optional[str]:
-        """Get valid access token, refreshing if needed."""
+    def get_access_token(self, force_refresh: bool = False) -> Optional[str]:
+        """Get valid access token, refreshing/recovering session when possible."""
         creds = self._load_credentials()
-        
-        if not creds.access_token:
-            return None
-        
-        if creds.is_expired() and creds.refresh_token:
-            # Try to refresh
-            if self._refresh_token(creds):
-                creds = self._load_credentials()
-            else:
-                return None
-        
-        return creds.access_token
+
+        if creds.access_token and not creds.is_expired() and not force_refresh:
+            return creds.access_token
+
+        if creds.refresh_token and self._refresh_token(creds):
+            refreshed = self._load_credentials()
+            if refreshed.access_token:
+                return refreshed.access_token
+
+        # Local/dev convenience fallback:
+        # if refresh token is invalid but email is known, perform a silent re-login.
+        if creds.email and self.login(creds.email):
+            relogged = self._load_credentials()
+            return relogged.access_token
+
+        return None
     
     def _refresh_token(self, creds: SaasCredentials) -> bool:
         """Refresh access token using refresh token."""
@@ -88,10 +95,9 @@ class SaasAuthManager:
             return False
         
         try:
-            response = httpx.post(
+            response = self._http.post(
                 f"{self.backend_url}/v1/auth/refresh",
                 json={"refresh_token": creds.refresh_token},
-                timeout=30.0
             )
             
             if response.status_code == 200:
@@ -116,10 +122,9 @@ class SaasAuthManager:
     def login(self, email: str, password: Optional[str] = None) -> bool:
         """Login with email (magic link or password)."""
         try:
-            response = httpx.post(
+            response = self._http.post(
                 f"{self.backend_url}/v1/auth/login",
                 json={"email": email, "password": password},
-                timeout=30.0
             )
             
             if response.status_code == 200:
@@ -146,11 +151,10 @@ class SaasAuthManager:
         # Try to revoke on server
         if creds.refresh_token:
             try:
-                httpx.post(
+                self._http.post(
                     f"{self.backend_url}/v1/auth/logout",
                     headers=self.get_auth_headers(),
                     json={"refresh_token": creds.refresh_token},
-                    timeout=10.0
                 )
             except httpx.RequestError:
                 pass
@@ -167,6 +171,15 @@ class SaasAuthManager:
             return {"Authorization": f"Bearer {token}"}
         return {}
 
+    def close(self) -> None:
+        self._http.close()
+
+    def __del__(self) -> None:
+        try:
+            self.close()
+        except Exception:
+            pass
+
 
 class SaasTranscriptionService:
     """Transcription service that uses SaaS API with auth."""
@@ -174,26 +187,49 @@ class SaasTranscriptionService:
     def __init__(self, backend_url: str, auth_manager: Optional[SaasAuthManager] = None):
         self.backend_url = backend_url.rstrip("/")
         self.auth = auth_manager or SaasAuthManager(backend_url)
+        self._http = httpx.Client(
+            timeout=httpx.Timeout(120.0, connect=10.0, read=120.0),
+            limits=httpx.Limits(max_keepalive_connections=8, max_connections=16),
+        )
+        self.last_latency_ms: Optional[int] = None
+        self.last_transcribe_ms: Optional[int] = None
+        self.last_structure_ms: Optional[int] = None
     
     def transcribe_and_structure_file(self, audio_path: str) -> Tuple[str, str]:
         """Transcribe audio file using SaaS API."""
-        if not self.auth.is_logged_in():
+        token = self.auth.get_access_token()
+        if not token:
             raise RuntimeError(
                 "Not logged in. Run: python run_saas_daemon.py login <email>"
             )
-        
-        headers = self.auth.get_auth_headers()
-        
+        self.last_latency_ms = None
+        self.last_transcribe_ms = None
+        self.last_structure_ms = None
+
+        headers = {"Authorization": f"Bearer {token}"}
         with open(audio_path, "rb") as file_obj:
-            files = {"audio": (os.path.basename(audio_path), file_obj, "audio/wav")}
-            response = httpx.post(
+            audio_bytes = file_obj.read()
+
+        def _post_with_headers(request_headers: dict) -> httpx.Response:
+            files = {
+                "audio": (os.path.basename(audio_path), audio_bytes, "audio/wav")
+            }
+            return self._http.post(
                 f"{self.backend_url}/v1/transcribe",
-                headers=headers,
+                headers=request_headers,
                 files=files,
                 params={"structured": "true"},
-                timeout=120.0
             )
-        
+
+        response = _post_with_headers(headers)
+
+        if response.status_code == 401:
+            # Token can be invalid after backend restart (e.g. changed JWT secret).
+            # Force-refresh (or silent re-login) once, then retry.
+            recovered = self.auth.get_access_token(force_refresh=True)
+            if recovered:
+                response = _post_with_headers({"Authorization": f"Bearer {recovered}"})
+
         if response.status_code == 401:
             raise RuntimeError("Authentication expired. Please login again.")
         
@@ -208,20 +244,31 @@ class SaasTranscriptionService:
         payload = response.json()
         transcript = payload.get("transcript", "") or ""
         text = payload.get("text", "") or transcript
-        
+        self.last_latency_ms = payload.get("latency_ms")
+        self.last_transcribe_ms = payload.get("transcribe_ms")
+        self.last_structure_ms = payload.get("structure_ms")
+
         return transcript, text
     
     def get_usage(self) -> dict:
         """Get current usage stats."""
         headers = self.auth.get_auth_headers()
-        
-        response = httpx.get(
+
+        response = self._http.get(
             f"{self.backend_url}/v1/usage/current-period",
             headers=headers,
-            timeout=30.0
         )
         
         if response.status_code == 200:
             return response.json()
         
         return {}
+
+    def close(self) -> None:
+        self._http.close()
+
+    def __del__(self) -> None:
+        try:
+            self.close()
+        except Exception:
+            pass

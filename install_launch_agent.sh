@@ -11,7 +11,7 @@ else
   DEFAULT_PYTHON="$(command -v python3)"
 fi
 PYTHON_BIN="${PYTHON_BIN:-$DEFAULT_PYTHON}"
-BACKEND_URL="${AI_VOICER_BACKEND_URL:-}"
+BACKEND_URL="${AI_VOICER_BACKEND_URL:-http://127.0.0.1:8090}"
 
 mkdir -p "$HOME/Library/LaunchAgents"
 mkdir -p "$LOG_DIR"

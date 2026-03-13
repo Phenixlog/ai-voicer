@@ -2,6 +2,8 @@
 """Run Théoria SaaS Desktop Client."""
 import os
 import sys
+import atexit
+from pathlib import Path
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "src")
@@ -12,6 +14,57 @@ from ai_voicer.config import load_config
 from ai_voicer.logging_setup import setup_logging
 from ai_voicer.daemon_runtime import run_daemon
 from ai_voicer.saas_client import SaasAuthManager, SaasTranscriptionService
+
+
+def _is_pid_running(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def _daemon_pid_file() -> Path:
+    base = Path.home() / "Library" / "Application Support" / "Theoria"
+    base.mkdir(parents=True, exist_ok=True)
+    return base / "daemon.pid"
+
+
+def _acquire_single_instance_lock() -> Path:
+    pid_file = _daemon_pid_file()
+    current_pid = os.getpid()
+
+    if pid_file.exists():
+        try:
+            existing_pid = int(pid_file.read_text(encoding="utf-8").strip())
+        except Exception:
+            existing_pid = 0
+
+        if _is_pid_running(existing_pid):
+            print("❌ A daemon instance is already running.")
+            print(f"   Existing PID: {existing_pid}")
+            print("   Stop it before starting another one.")
+            sys.exit(1)
+        try:
+            pid_file.unlink()
+        except OSError:
+            pass
+
+    pid_file.write_text(str(current_pid), encoding="utf-8")
+
+    def _cleanup_pid_file() -> None:
+        try:
+            if pid_file.exists():
+                saved_pid = int(pid_file.read_text(encoding="utf-8").strip() or "0")
+                if saved_pid == current_pid:
+                    pid_file.unlink()
+        except Exception:
+            pass
+
+    atexit.register(_cleanup_pid_file)
+    return pid_file
 
 
 def show_usage():
@@ -101,6 +154,7 @@ def cmd_status():
 def cmd_run():
     config = load_config()
     setup_logging(config.log_level)
+    _acquire_single_instance_lock()
     
     # Check login
     auth = SaasAuthManager(config.backend_url or "http://127.0.0.1:8090")

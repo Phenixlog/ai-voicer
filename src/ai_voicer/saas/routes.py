@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from typing import Optional
 import uuid
 import time
+import threading
 
 from .database import get_db
 from .models import User, UserSettings, Plan, Subscription
@@ -20,10 +21,14 @@ from .billing import (
 from .usage import check_quota, record_usage, get_usage_stats
 
 # Import existing service for transcription
-from ..config import AppConfig
+from ..config import AppConfig, load_config
 from ..mistral_service import MistralTranscriptionService
 
 router = APIRouter(prefix="/v1")
+
+_mistral_service_lock = threading.Lock()
+_mistral_service: Optional[MistralTranscriptionService] = None
+_mistral_service_signature: Optional[tuple] = None
 
 # Request/Response schemas
 class LoginRequest(BaseModel):
@@ -64,6 +69,34 @@ class TranscriptionResponse(BaseModel):
     text: str
     request_id: str
     latency_ms: int
+    transcribe_ms: Optional[int] = None
+    structure_ms: Optional[int] = None
+
+
+def _config_signature(config: AppConfig) -> tuple:
+    return (
+        config.mistral_api_key or "",
+        config.transcribe_model,
+        config.structure_model,
+        config.language or "",
+        config.context_bias or "",
+        bool(config.enable_structuring),
+    )
+
+
+def _get_mistral_service() -> tuple[MistralTranscriptionService, AppConfig]:
+    global _mistral_service, _mistral_service_signature
+
+    config = load_config()
+    signature = _config_signature(config)
+
+    with _mistral_service_lock:
+        if _mistral_service is None or _mistral_service_signature != signature:
+            _mistral_service = MistralTranscriptionService(config)
+            _mistral_service_signature = signature
+
+        # _mistral_service is guaranteed to be set inside the lock above.
+        return _mistral_service, config
 
 
 # Auth routes
@@ -320,9 +353,8 @@ async def transcribe_saas(
     """Transcribe audio with user auth and quota checking."""
     import os
     import tempfile
-    from ..config import load_config
-    
-    start_time = time.time()
+
+    start_time = time.perf_counter()
     
     # Save uploaded file temporarily
     suffix = os.path.splitext(audio.filename or "audio.wav")[1] or ".wav"
@@ -353,14 +385,22 @@ async def transcribe_saas(
                 detail=f"Quota exceeded. Upgrade your plan at /billing/checkout-session"
             )
         
-        # Load config and transcribe
-        config = load_config()
-        service = MistralTranscriptionService(config)
-        
+        # Reuse a shared Mistral service instance across requests.
+        service, config = _get_mistral_service()
+
+        transcribe_started = time.perf_counter()
         transcript = service.transcribe_file(audio_path)
-        final_text = service.structure_text(transcript) if structured else transcript
-        
-        latency_ms = int((time.time() - start_time) * 1000)
+        transcribe_ms = int((time.perf_counter() - transcribe_started) * 1000)
+
+        structure_ms = None
+        if structured:
+            structure_started = time.perf_counter()
+            final_text = service.structure_text(transcript)
+            structure_ms = int((time.perf_counter() - structure_started) * 1000)
+        else:
+            final_text = transcript
+
+        latency_ms = int((time.perf_counter() - start_time) * 1000)
         
         # Record successful usage
         request_id = record_usage(
@@ -377,7 +417,9 @@ async def transcribe_saas(
             transcript=transcript,
             text=final_text,
             request_id=request_id,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
+            transcribe_ms=transcribe_ms,
+            structure_ms=structure_ms,
         )
         
     except HTTPException:
