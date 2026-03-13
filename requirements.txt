@@ -1,10 +1,11 @@
-# Core
+# Core (cross-platform)
 mistralai
-sounddevice
 numpy
-pynput
 python-dotenv
 httpx
-# macOS only
+
+# macOS daemon only
+sounddevice; sys_platform == "darwin"
+pynput; sys_platform == "darwin"
 pyobjc-framework-Cocoa; sys_platform == "darwin"
 pyobjc-framework-Quartz; sys_platform == "darwin"
