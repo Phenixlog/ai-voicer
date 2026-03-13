@@ -5,5 +5,6 @@ numpy
 pynput
 python-dotenv
 httpx
-pyobjc-framework-Cocoa
-pyobjc-framework-Quartz
+# macOS only
+pyobjc-framework-Cocoa; sys_platform == "darwin"
+pyobjc-framework-Quartz; sys_platform == "darwin"
