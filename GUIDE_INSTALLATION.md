@@ -133,14 +133,14 @@ git --version
 Si tu vois un numero de version (par exemple `git version 2.39.0`), git est installe. Tape alors :
 
 ```
-cd ~/Documents && git clone https://github.com/keymusic/ai-voicer.git
+cd ~/Documents && git clone https://github.com/Phenixlog/ai-voicer.git
 ```
 
 > **Explication** : `cd ~/Documents` te deplace dans ton dossier Documents. `git clone` telecharge le projet depuis internet.
 
 ### Option B : Telecharger le ZIP (si git n'est pas installe)
 
-1. Va sur la page du projet avec ton navigateur
+1. Va sur **https://github.com/Phenixlog/ai-voicer** avec ton navigateur
 2. Clique sur le bouton vert **"Code"** puis sur **"Download ZIP"**
 3. Le fichier ZIP se telecharge dans ton dossier **Telechargements**
 4. Double-clique sur le fichier ZIP pour le decompresser
@@ -330,7 +330,7 @@ Le fonctionnement est simple et toujours le meme :
 4. Relache **Option**
 5. Le texte apparait
 
-Tu peux dicter aussi longtemps que tu veux (jusqu'a 2 minutes par enregistrement par defaut).
+Par defaut, chaque enregistrement est limite a 10 secondes (securite). Tu peux augmenter cette duree dans la configuration si besoin.
 
 ### Historique des transcriptions
 
@@ -484,10 +484,10 @@ Controle le detail des messages de log. Valeurs possibles :
 #### Duree maximum d'enregistrement
 
 ```
-AI_VOICER_MAX_RECORD_SECONDS=120
+AI_VOICER_MAX_RECORD_SECONDS=10
 ```
 
-Duree maximale d'un seul enregistrement en secondes. Par defaut : 120 secondes (2 minutes).
+Duree maximale d'un seul enregistrement en secondes. Par defaut : 10 secondes (securite anti-blocage). Tu peux augmenter cette valeur si tu fais des dictees longues, mais 10 secondes suffit pour la plupart des usages et empeche l'outil de rester bloque.
 
 ### Appliquer les modifications
 
