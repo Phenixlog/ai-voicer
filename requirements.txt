@@ -6,3 +6,4 @@ pynput
 python-dotenv
 httpx
 pyobjc-framework-Cocoa
+pyobjc-framework-Quartz
