@@ -1,5 +1,5 @@
 # Core (cross-platform)
-mistralai
+mistralai<2
 numpy
 python-dotenv
 httpx
