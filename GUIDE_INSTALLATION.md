@@ -330,7 +330,7 @@ Le fonctionnement est simple et toujours le meme :
 4. Relache **Option**
 5. Le texte apparait
 
-Par defaut, chaque enregistrement est limite a 10 secondes (securite). Tu peux augmenter cette duree dans la configuration si besoin.
+Par defaut, chaque enregistrement est limite a 2 minutes. Tu peux ajuster cette duree dans la configuration si besoin.
 
 ### Historique des transcriptions
 
@@ -484,10 +484,10 @@ Controle le detail des messages de log. Valeurs possibles :
 #### Duree maximum d'enregistrement
 
 ```
-AI_VOICER_MAX_RECORD_SECONDS=10
+AI_VOICER_MAX_RECORD_SECONDS=120
 ```
 
-Duree maximale d'un seul enregistrement en secondes. Par defaut : 10 secondes (securite anti-blocage). Tu peux augmenter cette valeur si tu fais des dictees longues, mais 10 secondes suffit pour la plupart des usages et empeche l'outil de rester bloque.
+Duree maximale d'un seul enregistrement en secondes. Par defaut : 120 secondes (2 minutes). C'est une securite : si le relachement de la touche n'est pas detecte, l'enregistrement s'arrete automatiquement apres cette duree.
 
 ### Appliquer les modifications
 

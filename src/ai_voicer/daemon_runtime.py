@@ -109,11 +109,8 @@ class PushToTalkDaemon:
         self._debounce_s = 0.15
         # Lock to prevent concurrent _stop_and_queue calls from multiple threads
         self._stop_lock = threading.Lock()
-        # Failsafe: 10s max — if release is truly missed, don't wait 2 minutes
-        self._max_record_seconds = min(
-            max(0.0, float(config.max_record_seconds)),
-            10.0,
-        )
+        # Failsafe: cap at configured max (default 120s)
+        self._max_record_seconds = max(0.0, float(config.max_record_seconds))
         self._recording_started_at: float | None = None
         self._overlay_is_recording = False  # track overlay state for desync detection
 
